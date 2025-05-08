@@ -1,8 +1,9 @@
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { LoginComponent } from './auth/login/login.component';
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { roleGuard } from './core/guards/role.guard';
+import { StoreListComponent } from './admin/store-list/store-list.component';
+import { adminGuard } from './core/guards/admin.guard';
+import { RoomListComponent } from './admin/room-list/room-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -10,8 +11,20 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: DashboardComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { role: 'admin' },
+    canActivate: [adminGuard],
+    children: [
+      { path: '', redirectTo: 'stores', pathMatch: 'full' },
+      { path: 'stores', component: StoreListComponent },
+      { path: 'rooms', component: RoomListComponent },
+    ],
   },
-  { path: '**', redirectTo: '/login' },
+  {
+    path: 'owner',
+    component: DashboardComponent,
+    children: [
+      { path: '', redirectTo: 'stores', pathMatch: 'full' },
+      { path: 'stores', component: StoreListComponent },
+      { path: 'rooms', component: StoreListComponent },
+    ],
+  },
 ];

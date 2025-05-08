@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { LoginResponse } from '../../interfaces/loginInterface';
+import { LoginResponse } from '../../interface/loginInterface';
 import { environment } from '../../env/enviroment';
 
 @Injectable({
