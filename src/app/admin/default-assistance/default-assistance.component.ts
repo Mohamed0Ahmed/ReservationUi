@@ -1,51 +1,32 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { debounceTime, Subject } from 'rxjs';
 import { AssistanceDto } from '../../interface/interfaces';
 import { AssistanceService } from '../../core/services/Assistance.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-default-assistance',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './default-assistance.component.html',
   styleUrls: ['./default-assistance.component.css'],
 })
 export class DefaultAssistanceComponent {
   activeAssistanceTypes = signal<AssistanceDto[]>([]);
   deletedAssistanceTypes = signal<AssistanceDto[]>([]);
-  searchQuery = signal('');
   showDeleted = signal(false);
   modalError = signal('');
   showModal = signal(false);
   modalAction = signal<'add' | 'edit' | 'delete' | 'restore'>('add');
   selectedAssistanceId = signal<number | null>(null);
   newAssistanceName = signal('');
-  private searchSubject = new Subject<string>();
-
-  filteredAssistanceTypes = computed(() => {
-    const query = this.searchQuery().toLowerCase();
-    const assistanceToFilter = this.showDeleted()
-      ? this.deletedAssistanceTypes()
-      : this.activeAssistanceTypes();
-    return assistanceToFilter.filter((assistance) =>
-      assistance.name.toLowerCase().includes(query)
-    );
-  });
 
   constructor(
     private assistanceService: AssistanceService,
     private toastr: ToastrService
   ) {
     this.loadAssistanceTypes();
-    this.setupSearch();
-  }
-
-  private setupSearch() {
-    this.searchSubject.pipe(debounceTime(300)).subscribe((query) => {
-      this.searchQuery.set(query);
-    });
   }
 
   loadAssistanceTypes() {
@@ -76,20 +57,11 @@ export class DefaultAssistanceComponent {
     });
   }
 
-  onSearchChange(query: string) {
-    this.searchSubject.next(query);
-  }
-
   toggleShowDeleted() {
     this.showDeleted.update((v) => !v);
     if (this.showDeleted() && this.deletedAssistanceTypes().length === 0) {
       this.loadDeletedAssistanceTypes();
     }
-  }
-
-  clearSearch() {
-    this.searchQuery.set('');
-    this.searchSubject.next('');
   }
 
   openModal(
@@ -145,8 +117,6 @@ export class DefaultAssistanceComponent {
           this.toastr.success(res.message || 'تمت العملية بنجاح');
           this.closeModal();
         } else {
-          console.log(res.message);
-
           this.modalError.set(res.message || 'فشل العملية');
           this.toastr.error(res.message || 'فشل العملية، حاول مرة أخرى');
         }
@@ -176,12 +146,12 @@ export class DefaultAssistanceComponent {
             this.activeAssistanceTypes.update((types) =>
               types.filter((a) => a.id !== assistanceId)
             );
-            this.loadDeletedAssistanceTypes(); // تحديث القائمة المحذوفة
+            this.loadDeletedAssistanceTypes();
           } else {
             this.deletedAssistanceTypes.update((types) =>
               types.filter((a) => a.id !== assistanceId)
             );
-            this.loadAssistanceTypes(); // تحديث القائمة النشطة
+            this.loadAssistanceTypes();
           }
           this.toastr.success(res.message || 'تمت العملية بنجاح');
           this.closeModal();
