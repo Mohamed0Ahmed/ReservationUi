@@ -4,6 +4,7 @@ import { Routes } from '@angular/router';
 import { StoreListComponent } from './admin/store-list/store-list.component';
 import { adminGuard } from './core/guards/admin.guard';
 import { RoomListComponent } from './admin/room-list/room-list.component';
+import { DefaultAssistanceComponent } from './admin/default-assistance/default-assistance.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -16,6 +17,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'stores', pathMatch: 'full' },
       { path: 'stores', component: StoreListComponent },
       { path: 'rooms', component: RoomListComponent },
+      { path: 'default-assistance', component: DefaultAssistanceComponent },
     ],
   },
   {

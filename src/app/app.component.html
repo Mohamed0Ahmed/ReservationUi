@@ -1,1 +1,8 @@
-<router-outlet></router-outlet>
+<div class="app-container">
+  <router-outlet></router-outlet>
+  @if (loadingService.loading() > 0) {
+  <div class="overlay">
+    <span class="loader">جارٍ التحميل...</span>
+  </div>
+  }
+</div>

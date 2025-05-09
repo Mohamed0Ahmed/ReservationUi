@@ -17,3 +17,21 @@ export interface Room {
   password: string;
   storeId: number;
 }
+
+export interface AssistanceRequestType {
+  id: number;
+  name: string;
+}
+
+export interface DefaultAssistanceRequestType {
+  id: number;
+  name: string;
+  createdOn?: Date;
+  lastModifiedOn?: Date;
+  isDeleted?: boolean;
+}
+
+export interface AssistanceDto {
+  id: number;
+  name: string;
+}

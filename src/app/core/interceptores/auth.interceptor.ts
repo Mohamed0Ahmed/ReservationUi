@@ -1,4 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { LoadingService } from '../services/loading.service';
+import { finalize } from 'rxjs';
+import { inject } from '@angular/core';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('token');
@@ -12,5 +15,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  return next(authReq);
+  const loadingService = inject(LoadingService);
+  loadingService.show();
+
+  return next(authReq).pipe(
+    finalize(() => {
+      loadingService.hide();
+    })
+  );
 };
