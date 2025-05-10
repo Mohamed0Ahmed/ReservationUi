@@ -10,12 +10,23 @@ import { AssistanceComponent } from './owner/assistance/assistance.component';
 import { CategoryComponent } from './owner/category/category.component';
 import { OrdersComponent } from './owner/orders/orders.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { RoomLoginComponent } from './room/room-login/room-login.component';
+import { HomeComponent } from './room/home/home.component';
+import { RoomLayoutComponent } from './room/room-layout/room-layout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
-
   { path: 'login', component: LoginComponent },
+  {
+    path: 'room',
+    component: RoomLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: HomeComponent },
+      { path: 'login', component: RoomLoginComponent },
+    ],
+  },
   {
     path: 'admin',
     component: DashboardComponent,

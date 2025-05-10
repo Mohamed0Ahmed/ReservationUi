@@ -1,0 +1,63 @@
+<div dir="rtl" class="container mx-auto p-6">
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="text-center text-gray-600">جاري التحميل...</div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="text-center text-red-600 font-bold">{{ error() }}</div>
+  }
+
+  <!-- Categories Section -->
+  @if (categories().length) {
+  <div class="mb-6">
+    <h2 class="text-xl font-bold mb-4">الأقسام</h2>
+    <div class="flex flex-wrap gap-4">
+      <!-- "All" Button -->
+      <div
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700"
+        (click)="selectCategory(null)"
+        [class.bg-gray-300]="!selectedCategory()"
+        [class.text-gray-800]="!selectedCategory()"
+      >
+        الكل
+      </div>
+      <!-- Category Cards -->
+      @for (category of categories(); track category.id) {
+      <div
+        class="bg-white shadow-md rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-100"
+        (click)="selectCategory(category.id)"
+        [class.bg-gray-300]="selectedCategory() === category.id"
+      >
+        {{ category.name }}
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Items Section -->
+  @if (items().length) {
+  <div>
+    <h2 class="text-xl font-bold mb-4">الأصناف</h2>
+    <div class="space-y-4">
+      @for (item of getFilteredItems(); track item.id) {
+      <div
+        class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center"
+      >
+        <div>
+          <h3 class="text-lg font-semibold">{{ item.name }}</h3>
+          <p class="text-gray-600">السعر: {{ item.price }} جنيه</p>
+          <p class="text-gray-600">
+            النقاط المطلوبة: {{ item.pointsRequired }}
+          </p>
+        </div>
+      </div>
+      } @empty {
+      <div class="text-center text-gray-600">لا توجد أصناف في هذا القسم</div>
+      }
+    </div>
+  </div>
+  }
+</div>

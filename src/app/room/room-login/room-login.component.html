@@ -1,0 +1,69 @@
+<div
+  dir="rtl"
+  class="min-h-screen flex items-center justify-center bg-gray-100"
+>
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+      تسجيل دخول الغرفة
+    </h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label for="storeName" class="block text-sm font-medium text-gray-700">
+          اسم المحل
+        </label>
+        <input
+          type="text"
+          id="storeName"
+          formControlName="storeName"
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        @if (storeName?.touched && storeName?.invalid) { @if
+        (storeName?.errors?.['required']) {
+        <div class="text-red-500 text-sm mt-1">ادخل اسم المحل</div>
+        } }
+      </div>
+
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700">
+          اسم المستخدم
+        </label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        @if (username?.touched && username?.invalid) { @if
+        (username?.errors?.['required']) {
+        <div class="text-red-500 text-sm mt-1">ادخل اسم المستخدم</div>
+        } }
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          كلمة المرور
+        </label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        @if (password?.touched && password?.invalid) { @if
+        (password?.errors?.['required']) {
+        <div class="text-red-500 text-sm mt-1">ادخل كلمة المرور</div>
+        } } @if (message()) {
+        <h2 class="text-center font-bold text-red-600">{{ message() }}</h2>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        تسجيل دخول
+      </button>
+    </form>
+  </div>
+</div>

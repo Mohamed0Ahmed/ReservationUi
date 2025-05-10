@@ -14,15 +14,40 @@ export class AuthService {
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
   private userRole: string | null = null;
   private storeId: string | null = null;
+  private roomId: string | null = null; 
 
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('token');
     if (token) {
-      const { role, storeId } = this.getRoleAndStoreIdFromToken(token);
+      const { role, storeId, roomId } = this.getRoleAndStoreIdFromToken(token);
       this.userRole = role;
       this.storeId = storeId;
+      this.roomId = roomId;
       this.isLoggedInSubject.next(true);
     }
+  }
+
+  roomLogin(
+    storeName: string,
+    username: string,
+    password: string
+  ): Observable<any> {
+    const body = { storeName, userName: username, password };
+    return this.http.post<any>(`${this.apiUrl}/auth/room/login`, body).pipe(
+      tap((response) => {
+        if (response.isSuccess && response.data) {
+          const token = response.data.token;
+          localStorage.setItem('token', token);
+          const { role, storeId, roomId } =
+            this.getRoleAndStoreIdFromToken(token);
+          this.userRole = role;
+          this.storeId = storeId;
+          this.roomId = roomId;
+          this.isLoggedInSubject.next(true);
+          this.router.navigate(['/room']);
+        }
+      })
+    );
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
@@ -33,9 +58,11 @@ export class AuthService {
           if (response.isSuccess && response.message) {
             const token = response.message;
             localStorage.setItem('token', token);
-            const { role, storeId } = this.getRoleAndStoreIdFromToken(token);
+            const { role, storeId, roomId } =
+              this.getRoleAndStoreIdFromToken(token);
             this.userRole = role;
             this.storeId = storeId;
+            this.roomId = roomId;
             this.isLoggedInSubject.next(true);
 
             if (this.userRole === 'Admin') {
@@ -49,6 +76,7 @@ export class AuthService {
         })
       );
   }
+
   register(email: string, password: string): Observable<any> {
     return this.http
       .post<any>(`${this.apiUrl}/auth/register`, { email, password })
@@ -76,10 +104,15 @@ export class AuthService {
     return this.storeId;
   }
 
+  getRoomId(): string | null {
+    return this.roomId;
+  } // دالة جديدة لـ roomId
+
   logout(): void {
     localStorage.removeItem('token');
     this.userRole = null;
     this.storeId = null;
+    this.roomId = null;
     this.isLoggedInSubject.next(false);
     this.router.navigate(['/login']);
   }
@@ -91,6 +124,7 @@ export class AuthService {
   private getRoleAndStoreIdFromToken(token: string): {
     role: string | null;
     storeId: string | null;
+    roomId: string | null;
   } {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -99,9 +133,10 @@ export class AuthService {
           'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
         ] || null;
       const storeId = payload['storeId'] || null;
-      return { role, storeId };
+      const roomId = payload['roomId'] || null;
+      return { role, storeId, roomId };
     } catch (e) {
-      return { role: null, storeId: null };
+      return { role: null, storeId: null, roomId: null };
     }
   }
 }
