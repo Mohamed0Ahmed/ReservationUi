@@ -21,6 +21,14 @@
       >
         الطلبات
       </a>
+      <a
+        [routerLink]="['/owner/assistance']"
+        routerLinkActive="text-blue-300"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="px-3 py-2 hover:text-blue-300 transition"
+      >
+        المساعدات
+      </a>
       <button
         (click)="logout()"
         class="px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"

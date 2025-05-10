@@ -130,7 +130,7 @@ export class CategoryComponent implements OnInit {
             );
             this.categories[index] = response.data;
             this.editCategory = null;
-            this.toastr.success('تم تعديل القسم بنجاح');
+            this.toastr.success(response.message);
           } else {
             this.toastr.error(response.message || 'فشل في تعديل القسم');
           }
@@ -198,7 +198,7 @@ export class CategoryComponent implements OnInit {
             categoryId: 0,
             storeId: 0,
           };
-          this.toastr.success('تم إضافة الصنف بنجاح');
+          this.toastr.success(response.message);
         } else {
           this.toastr.error(response.message || 'فشل في إضافة الصنف');
         }
