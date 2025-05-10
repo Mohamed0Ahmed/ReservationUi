@@ -1,0 +1,268 @@
+<div class="container mx-auto p-6" dir="rtl">
+  <h1 class="text-2xl font-bold mb-4">إدارة الأقسام</h1>
+
+  <!-- Form to Add New Category -->
+  <div class="mb-6">
+    <input
+      type="text"
+      [(ngModel)]="newCategoryName"
+      placeholder="اسم القسم الجديد"
+      class="border p-2 rounded-lg w-64"
+    />
+    <button
+      (click)="createCategory()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg mr-2 hover:bg-blue-700"
+    >
+      إضافة قسم
+    </button>
+    <button
+      (click)="toggleDeleted()"
+      class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+    >
+      {{ showDeleted ? "عرض الأقسام النشطة" : "عرض الأقسام المحذوفة" }}
+    </button>
+  </div>
+
+  <!-- Categories Table -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="border p-2">الاسم</th>
+          <th class="border p-2">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container
+          *ngFor="let category of showDeleted ? deletedCategories : categories"
+        >
+          <tr class="border text-center">
+            <td class="border p-2">{{ category.name }}</td>
+            <td class="border p-2">
+              <button
+                *ngIf="!showDeleted"
+                (click)="startEditCategory(category)"
+                class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
+              >
+                تعديل
+              </button>
+              <button
+                *ngIf="!showDeleted"
+                (click)="deleteCategory(category.id)"
+                class="bg-red-500 text-white px-2 py-1 rounded mr-2 hover:bg-red-600"
+              >
+                حذف
+              </button>
+              <button
+                *ngIf="showDeleted"
+                (click)="restoreCategory(category.id)"
+                class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+              >
+                استرجاع
+              </button>
+              <button
+                *ngIf="!showDeleted"
+                (click)="toggleItems(category.id)"
+                class="bg-indigo-500 text-white px-2 py-1 rounded mr-2 hover:bg-indigo-600"
+              >
+                {{ showItems[category.id] ? "إخفاء الأصناف" : "إظهار الأصناف" }}
+              </button>
+            </td>
+          </tr>
+          <!-- Items for this Category -->
+          <tr *ngIf="!showDeleted && showItems[category.id]">
+            <td colspan="3" class="p-4">
+              <div class="border p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-center">
+                  الأصناف في {{ category.name }}
+                </h3>
+                <!-- Form to Add New Item -->
+                <div class="mb-4">
+                  <input
+                    type="text"
+                    [(ngModel)]="newItem.name"
+                    placeholder="اسم الصنف"
+                    class="border p-2 rounded-lg w-32 mr-2"
+                  />
+                  <input
+                    type="number"
+                    [ngModel]="newItem.price === 0 ? null : newItem.price"
+                    (ngModelChange)="newItem.price = $event || 0"
+                    placeholder="السعر"
+                    class="border p-2 rounded-lg w-24 mr-2"
+                  />
+                  <input
+                    type="number"
+                    [ngModel]="
+                      newItem.pointsRequired === 0
+                        ? null
+                        : newItem.pointsRequired
+                    "
+                    (ngModelChange)="newItem.pointsRequired = $event || 0"
+                    placeholder="النقاط المطلوبة"
+                    class="border p-2 rounded-lg w-36 mr-2"
+                  />
+                  <button
+                    (click)="createItem(category.id)"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  >
+                    إضافة صنف
+                  </button>
+                </div>
+                <!-- Active Items Table -->
+                <table
+                  class="min-w-full border-collapse border border-gray-300 mb-4"
+                >
+                  <thead>
+                    <tr class="bg-gray-100">
+                      <th class="border p-2">الاسم</th>
+                      <th class="border p-2">السعر</th>
+                      <th class="border p-2">النقاط المطلوبة</th>
+                      <th class="border p-2">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let item of items[category.id] || []"
+                      class="border text-center"
+                    >
+                      <td class="border p-2">{{ item.name }}</td>
+                      <td class="border p-2">{{ item.price }}</td>
+                      <td class="border p-2">{{ item.pointsRequired }}</td>
+                      <td class="border p-2">
+                        <button
+                          (click)="startEditItem(item)"
+                          class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
+                        >
+                          تعديل
+                        </button>
+                        <button
+                          (click)="deleteItem(category.id, item.id)"
+                          class="bg-red-500 text-white px-2 py-1 rounded mr-2 hover:bg-red-600"
+                        >
+                          حذف
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- Deleted Items Table -->
+                @if (deletedItems[category.id]) {
+                <h3 class="text-lg text-red-500 text-center mb-2 font-bold ">الأصناف المحذوفة</h3>
+                <table
+                  class="min-w-full border-collapse border border-gray-300"
+                >
+                  <thead>
+                    <tr class="bg-gray-100">
+                      <th class="border p-2">الاسم</th>
+                      <th class="border p-2">السعر</th>
+                      <th class="border p-2">النقاط المطلوبة</th>
+                      <th class="border p-2">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let item of deletedItems[category.id] || []"
+                      class="border text-center"
+                    >
+                      <td class="border p-2">{{ item.name }}</td>
+                      <td class="border p-2">{{ item.price }}</td>
+                      <td class="border p-2">{{ item.pointsRequired }}</td>
+                      <td class="border p-2">
+                        <button
+                          (click)="restoreItem(category.id, item.id)"
+                          class="bg-green-500 text-white px-2 py-1 rounded mr-2 hover:bg-green-600"
+                        >
+                          استعادة
+                        </button>
+                        <button
+                          (click)="hardDeleteItem(category.id, item.id)"
+                          class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                        >
+                          حذف نهائي
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div
+    *ngIf="editCategory"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+  >
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl font-bold mb-4">تعديل القسم</h2>
+      <input
+        type="text"
+        [(ngModel)]="editCategory.name"
+        placeholder="اسم القسم"
+        class="border p-2 rounded-lg w-full mb-4"
+      />
+      <div class="flex justify-end">
+        <button
+          (click)="editCategory = null"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-600"
+        >
+          إلغاء
+        </button>
+        <button
+          (click)="updateCategory()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          حفظ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Item Modal -->
+  <div
+    *ngIf="editItem"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+  >
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl font-bold mb-4">تعديل الصنف</h2>
+      <input
+        type="text"
+        [(ngModel)]="editItem.name"
+        placeholder="اسم الصنف"
+        class="border p-2 rounded-lg w-full mb-4"
+      />
+      <input
+        type="number"
+        [(ngModel)]="editItem.price"
+        placeholder="السعر"
+        class="border p-2 rounded-lg w-full mb-4"
+      />
+      <input
+        type="number"
+        [(ngModel)]="editItem.pointsRequired"
+        placeholder="النقاط المطلوبة"
+        class="border p-2 rounded-lg w-full mb-4"
+      />
+      <div class="flex justify-end">
+        <button
+          (click)="editItem = null"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-600"
+        >
+          إلغاء
+        </button>
+        <button
+          (click)="updateItem()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          حفظ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

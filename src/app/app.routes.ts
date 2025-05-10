@@ -5,9 +5,16 @@ import { StoreListComponent } from './admin/store-list/store-list.component';
 import { adminGuard } from './core/guards/admin.guard';
 import { RoomListComponent } from './admin/room-list/room-list.component';
 import { DefaultAssistanceComponent } from './admin/default-assistance/default-assistance.component';
+import { OwnerDashboardComponent } from './owner/owner-dashboard/owner-dashboard.component';
+import { AssistanceComponent } from './owner/assistance/assistance.component';
+import { CategoryComponent } from './owner/category/category.component';
+import { OrdersComponent } from './owner/orders/orders.component';
+import { RegisterComponent } from './auth/register/register.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'register', component: RegisterComponent },
+
   { path: 'login', component: LoginComponent },
   {
     path: 'admin',
@@ -22,11 +29,12 @@ export const routes: Routes = [
   },
   {
     path: 'owner',
-    component: DashboardComponent,
+    component: OwnerDashboardComponent,
     children: [
-      { path: '', redirectTo: 'stores', pathMatch: 'full' },
-      { path: 'stores', component: StoreListComponent },
-      { path: 'rooms', component: StoreListComponent },
+      { path: '', redirectTo: 'orders', pathMatch: 'full' },
+      { path: 'assistance', component: AssistanceComponent },
+      { path: 'category', component: CategoryComponent },
+      { path: 'orders', component: OrdersComponent },
     ],
   },
 ];

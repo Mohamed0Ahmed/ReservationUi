@@ -1,0 +1,18 @@
+button {
+  transition: background-color 0.3s;
+}
+
+input {
+  border: 1px solid #d1d5db;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.fixed.inset-0 {
+  z-index: 50;
+}
+
+.bg-white.p-6 {
+  max-width: 400px;
+  width: 100%;
+}

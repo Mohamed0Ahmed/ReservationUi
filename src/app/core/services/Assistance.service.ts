@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   ApiResponse,
-  AssistanceDto,
-  DefaultAssistanceRequestType,
+  Assistance,
 } from '../../interface/interfaces';
 import { environment } from '../../env/enviroment';
 
@@ -16,20 +15,18 @@ export class AssistanceService {
 
   constructor(private http: HttpClient) {}
 
-  getDefaultAssistanceTypes(): Observable<ApiResponse<AssistanceDto[]>> {
-    return this.http.get<ApiResponse<AssistanceDto[]>>(`${this.apiUrl}`);
+  getDefaultAssistanceTypes(): Observable<ApiResponse<Assistance[]>> {
+    return this.http.get<ApiResponse<Assistance[]>>(`${this.apiUrl}`);
   }
 
-  getDefaultDeletedAssistanceTypes(): Observable<ApiResponse<AssistanceDto[]>> {
-    return this.http.get<ApiResponse<AssistanceDto[]>>(
-      `${this.apiUrl}/deleted`
-    );
+  getDefaultDeletedAssistanceTypes(): Observable<ApiResponse<Assistance[]>> {
+    return this.http.get<ApiResponse<Assistance[]>>(`${this.apiUrl}/deleted`);
   }
 
   createDefaultAssistanceType(assistance: {
     Name: string;
-  }): Observable<ApiResponse<DefaultAssistanceRequestType>> {
-    return this.http.post<ApiResponse<DefaultAssistanceRequestType>>(
+  }): Observable<ApiResponse<Assistance>> {
+    return this.http.post<ApiResponse<Assistance>>(
       `${this.apiUrl}`,
       assistance
     );
@@ -40,8 +37,8 @@ export class AssistanceService {
     assistance: {
       Name: string;
     }
-  ): Observable<ApiResponse<DefaultAssistanceRequestType>> {
-    return this.http.put<ApiResponse<DefaultAssistanceRequestType>>(
+  ): Observable<ApiResponse<Assistance>> {
+    return this.http.put<ApiResponse<Assistance>>(
       `${this.apiUrl}/${id}`,
       assistance
     );

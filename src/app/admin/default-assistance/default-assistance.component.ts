@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { AssistanceDto } from '../../interface/interfaces';
 import { AssistanceService } from '../../core/services/Assistance.service';
 import { CommonModule } from '@angular/common';
+import { Assistance } from '../../interface/interfaces';
 
 @Component({
   selector: 'app-default-assistance',
@@ -13,8 +13,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./default-assistance.component.css'],
 })
 export class DefaultAssistanceComponent {
-  activeAssistanceTypes = signal<AssistanceDto[]>([]);
-  deletedAssistanceTypes = signal<AssistanceDto[]>([]);
+  activeAssistanceTypes = signal<Assistance[]>([]);
+  deletedAssistanceTypes = signal<Assistance[]>([]);
   showDeleted = signal(false);
   modalError = signal('');
   showModal = signal(false);

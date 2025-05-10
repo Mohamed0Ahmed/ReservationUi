@@ -18,20 +18,21 @@ export interface Room {
   storeId: number;
 }
 
-export interface AssistanceRequestType {
+export interface Category {
   id: number;
   name: string;
+  storeId: number;
 }
-
-export interface DefaultAssistanceRequestType {
+export interface Item {
   id: number;
   name: string;
-  createdOn?: Date;
-  lastModifiedOn?: Date;
-  isDeleted?: boolean;
+  price: number;
+  pointsRequired: number;
+  categoryId: number;
+  storeId: number;
 }
 
-export interface AssistanceDto {
+export interface Assistance {
   id: number;
   name: string;
 }

@@ -1,0 +1,32 @@
+<header
+  dir="rtl"
+  class="bg-gray-800 text-white fixed top-0 w-full z-10 shadow-md"
+>
+  <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Owner Dashboard</h1>
+    <div class="flex space-x-4 space-x-reverse">
+      <a
+        [routerLink]="['/owner/category']"
+        routerLinkActive="text-blue-300"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="px-3 py-2 hover:text-blue-300 transition"
+      >
+        الأقسام
+      </a>
+      <a
+        [routerLink]="['/owner/orders']"
+        routerLinkActive="text-blue-300"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="px-3 py-2 hover:text-blue-300 transition"
+      >
+        الطلبات
+      </a>
+      <button
+        (click)="logout()"
+        class="px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+      >
+        تسجيل الخروج
+      </button>
+    </div>
+  </nav>
+</header>

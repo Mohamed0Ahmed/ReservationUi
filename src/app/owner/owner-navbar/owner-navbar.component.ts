@@ -3,13 +3,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-owner-navbar',
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  templateUrl: './owner-navbar.component.html',
+  styleUrl: './owner-navbar.component.css',
 })
-export class NavbarComponent {
+export class OwnerNavbarComponent {
   role: string | null = null;
 
   constructor(private authService: AuthService) {

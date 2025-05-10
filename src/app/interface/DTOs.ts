@@ -3,8 +3,13 @@ export interface CreateRoomRequest {
   username: string;
   password: string;
 }
-
 export interface UpdateRoomRequest {
   username: string;
   password: string;
+}
+
+export interface UpdateMenuItemRequest {
+  name: string;
+  price: number;
+  pointsRequired: number;
 }

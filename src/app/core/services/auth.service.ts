@@ -13,11 +13,14 @@ export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
   private userRole: string | null = null;
+  private storeId: string | null = null;
 
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('token');
     if (token) {
-      this.userRole = this.getRoleFromToken(token);
+      const { role, storeId } = this.getRoleAndStoreIdFromToken(token);
+      this.userRole = role;
+      this.storeId = storeId;
       this.isLoggedInSubject.next(true);
     }
   }
@@ -30,7 +33,9 @@ export class AuthService {
           if (response.isSuccess && response.message) {
             const token = response.message;
             localStorage.setItem('token', token);
-            this.userRole = this.getRoleFromToken(token);
+            const { role, storeId } = this.getRoleAndStoreIdFromToken(token);
+            this.userRole = role;
+            this.storeId = storeId;
             this.isLoggedInSubject.next(true);
 
             if (this.userRole === 'Admin') {
@@ -44,6 +49,20 @@ export class AuthService {
         })
       );
   }
+  register(email: string, password: string): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/auth/register`, { email, password })
+      .pipe(
+        tap((response) => {
+          if (response.isSuccess) {
+            console.log('تم التسجيل بنجاح');
+            this.router.navigate(['/login']);
+          } else {
+            console.warn('فشل التسجيل:', response.message);
+          }
+        })
+      );
+  }
 
   isLoggedIn(): boolean {
     return this.hasToken();
@@ -53,9 +72,14 @@ export class AuthService {
     return this.userRole;
   }
 
+  getStoreId(): string | null {
+    return this.storeId;
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     this.userRole = null;
+    this.storeId = null;
     this.isLoggedInSubject.next(false);
     this.router.navigate(['/login']);
   }
@@ -64,16 +88,20 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
-  private getRoleFromToken(token: string): string | null {
+  private getRoleAndStoreIdFromToken(token: string): {
+    role: string | null;
+    storeId: string | null;
+  } {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return (
+      const role =
         payload[
           'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-        ] || null
-      );
+        ] || null;
+      const storeId = payload['storeId'] || null;
+      return { role, storeId };
     } catch (e) {
-      return null;
+      return { role: null, storeId: null };
     }
   }
 }
