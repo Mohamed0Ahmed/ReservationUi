@@ -36,3 +36,21 @@ export interface Assistance {
   id: number;
   name: string;
 }
+export interface Order {
+  id: number;
+  customerNumber: string;
+  customerId: number;
+  roomId: number;
+  storeId: number;
+  totalAmount: number;
+  status: number;
+  rejectionReason: string;
+  orderDate: string;
+  orderItems: OrderItem[];
+}
+
+export interface OrderItem {
+  orderId: number;
+  menuItemId: number;
+  quantity: number;
+}
