@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class OwnerDashboardComponent implements OnInit, OnDestroy {
   private subscription: Subscription | null = null;
-  private audio = new Audio('/assets/mixkit-happy-bells-notification-937.wav');
+  private audio = new Audio('assets/mixkit-happy-bells-notification-937.wav');
 
   constructor(
     private notificationService: NotificationService,
