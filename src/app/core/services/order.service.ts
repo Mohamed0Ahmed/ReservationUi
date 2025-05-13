@@ -33,7 +33,7 @@ export class OrderService {
 
   rejectOrder(
     id: number,
-    rejectionReason: string
+    rejectionReason: { reason: string }
   ): Observable<ApiResponse<Order>> {
     return this.http.put<ApiResponse<Order>>(
       `${this.apiUrl}/reject/${id}`,

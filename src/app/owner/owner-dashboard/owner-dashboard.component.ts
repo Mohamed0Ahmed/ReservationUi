@@ -27,10 +27,11 @@ export class OwnerDashboardComponent implements OnInit, OnDestroy {
         this.subscription = this.notificationService.notification$.subscribe(
           (message) => {
             if (message) {
-              this.toastr.info(message, 'إشعار جديد', { timeOut: 500000000 });
-              this.audio
-                .play()
-                .catch((err) => console.error('Audio play error:', err));
+              this.toastr.info(message, 'إشعار جديد', {
+                disableTimeOut: true,
+                tapToDismiss: true,
+              });
+              this.audio.play();
             }
           }
         );

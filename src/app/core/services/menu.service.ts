@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../env/enviroment';
 import { AuthService } from './auth.service';
 import { ApiResponse } from '../../interface/interfaces';
@@ -12,11 +12,36 @@ import { UpdateMenuItemRequest } from '../../interface/DTOs';
 })
 export class MenuService {
   private apiUrl = `${environment.apiUrl}/menus`;
+  private itemsCache: Item[] | null = null;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   private getStoreId(): string | null {
     return this.authService.getStoreId();
+  }
+
+  getAllItems(storeId: number): Observable<ApiResponse<Item[]>> {
+    if (this.itemsCache) {
+      return of({
+        isSuccess: true,
+        statusCode: 200,
+        message: 'Cached data',
+        data: this.itemsCache,
+      });
+    }
+    return this.http
+      .get<ApiResponse<Item[]>>(`${this.apiUrl}/items/all/${storeId}`)
+      .pipe(
+        tap((res) => {
+          if (res.isSuccess && res.data) {
+            this.itemsCache = res.data;
+          }
+        })
+      );
+  }
+
+  clearItemsCache(): void {
+    this.itemsCache = null;
   }
 
   getCategories(): Observable<ApiResponse<Category[]>> {
@@ -77,6 +102,7 @@ export class MenuService {
       `${this.apiUrl}/items/${categoryId}`
     );
   }
+
   getDeletedItems(categoryId: number): Observable<ApiResponse<Item[]>> {
     return this.http.get<ApiResponse<Item[]>>(
       `${this.apiUrl}/items/deleted/${categoryId}`
@@ -84,29 +110,35 @@ export class MenuService {
   }
 
   createItem(item: Item): Observable<ApiResponse<Item>> {
-    return this.http.post<ApiResponse<Item>>(`${this.apiUrl}/items`, item);
+    return this.http
+      .post<ApiResponse<Item>>(`${this.apiUrl}/items`, item)
+      .pipe(tap(() => this.clearItemsCache()));
   }
 
   updateItem(
     id: number,
     item: UpdateMenuItemRequest
   ): Observable<ApiResponse<Item>> {
-    return this.http.put<ApiResponse<Item>>(`${this.apiUrl}/items/${id}`, item);
+    return this.http
+      .put<ApiResponse<Item>>(`${this.apiUrl}/items/${id}`, item)
+      .pipe(tap(() => this.clearItemsCache()));
   }
 
   deleteItem(id: number): Observable<ApiResponse<boolean>> {
-    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/items/${id}`);
+    return this.http
+      .delete<ApiResponse<boolean>>(`${this.apiUrl}/items/${id}`)
+      .pipe(tap(() => this.clearItemsCache()));
   }
+
   HardDeleteItem(id: number): Observable<ApiResponse<boolean>> {
-    return this.http.delete<ApiResponse<boolean>>(
-      `${this.apiUrl}/items/hard/${id}`
-    );
+    return this.http
+      .delete<ApiResponse<boolean>>(`${this.apiUrl}/items/hard/${id}`)
+      .pipe(tap(() => this.clearItemsCache()));
   }
 
   restoreItem(id: number): Observable<ApiResponse<boolean>> {
-    return this.http.put<ApiResponse<boolean>>(
-      `${this.apiUrl}/items/restore/${id}`,
-      {}
-    );
+    return this.http
+      .put<ApiResponse<boolean>>(`${this.apiUrl}/items/restore/${id}`, {})
+      .pipe(tap(() => this.clearItemsCache()));
   }
 }

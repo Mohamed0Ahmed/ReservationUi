@@ -24,6 +24,7 @@ export class NotificationService {
 
       this.hubConnection = new HubConnectionBuilder()
         .withUrl(environment.signalRHubUrl)
+        .configureLogging('none')
         .build();
 
       this.hubConnection

@@ -1,72 +1,198 @@
 <div class="container mx-auto p-4" dir="rtl">
-  <h1 class="text-2xl font-bold mb-4">الطلبات</h1>
-  <div class="mb-4 flex items-center">
-    <p class="mr-4">إجمالي الطلبات: {{ totalOrders() }}</p>
+  <h1 class="text-2xl font-bold mb-4">الطلبات وطلبات المساعدة</h1>
+  <div class="mb-4 flex items-center space-x-2">
+    <p class="mr-4">
+      إجمالي:
+      {{
+        currentFilter() === "orders" || currentFilter() === "pendingOrders"
+          ? totalOrders()
+          : totalAssistanceRequests()
+      }}
+      {{
+        currentFilter() === "orders" || currentFilter() === "pendingOrders"
+          ? "طلبات"
+          : "طلبات مساعدة"
+      }}
+    </p>
     <button
-      (click)="toggleShowPendingOnly()"
-      class="px-4 py-2 mx-3 hover:bg-opacity-80"
+      (click)="setFilter('orders')"
+      class="px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
-        showPendingOnly()
-          ? 'bg-blue-500 text-white hover:bg-blue-600'
-          : 'bg-gray-500 text-white hover:bg-gray-600'
+        currentFilter() === 'orders'
+          ? 'bg-green-500 text-white hover:bg-green-600'
+          : 'bg-blue-500 text-white hover:bg-blue-600'
       "
     >
-      {{ showPendingOnly() ? "عرض الكل" : "عرض المعلقة فقط" }}
+      الاوردرات
+    </button>
+    <button
+      (click)="setFilter('pendingOrders')"
+      class="px-4 py-2 hover:bg-opacity-80"
+      [ngClass]="
+        currentFilter() === 'pendingOrders'
+          ? 'bg-green-500 text-white hover:bg-green-600'
+          : 'bg-blue-500 text-white hover:bg-blue-600'
+      "
+    >
+      الاوردرات المعلقة
+    </button>
+    <button
+      (click)="setFilter('assistance')"
+      class="px-4 py-2 hover:bg-opacity-80"
+      [ngClass]="
+        currentFilter() === 'assistance'
+          ? 'bg-green-500 text-white hover:bg-green-600'
+          : 'bg-blue-500 text-white hover:bg-blue-600'
+      "
+    >
+      طلبات المساعدة
+    </button>
+    <button
+      (click)="setFilter('assistancePending')"
+      class="px-4 py-2 hover:bg-opacity-80"
+      [ngClass]="
+        currentFilter() === 'assistancePending'
+          ? 'bg-green-500 text-white hover:bg-green-600'
+          : 'bg-blue-500 text-white hover:bg-blue-600'
+      "
+    >
+      طلبات المساعدة المعلقة
     </button>
   </div>
-  <table class="min-w-full bg-white border-collapse">
-    <thead>
-      <tr>
-        <th class="py-2 px-4 border-b">رقم العميل</th>
-        <th class="py-2 px-4 border-b">تاريخ الطلب</th>
-        <th class="py-2 px-4 border-b">الأصناف</th>
-        <th class="py-2 px-4 border-b">المجموع</th>
-        <th class="py-2 px-4 border-b">الحالة</th>
-        <th class="py-2 px-4 border-b">الإجراءات</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (order of filteredOrders(); track order.id) {
-      <tr class="text-center">
-        <td class="py-2 px-4 border-b">{{ order.customerNumber }}</td>
-        <td class="py-2 px-4 border-b">
-          {{ order.orderDate | date : "short" }}
-        </td>
-        <td class="py-2 px-4 border-b">
-          @for (item of order.orderItems; track item.menuItemId) {
-          <div>{{ getItemName(item.menuItemId) }} ({{ item.quantity }})</div>
-          }
-        </td>
-        <td class="py-2 px-4 border-b">{{ order.totalAmount }} جنيه</td>
-        <td class="py-2 px-4 border-b">{{ getStatusLabel(order.status) }}</td>
-        <td class="py-2 px-4 border-b space-x-2">
-          @if (order.status === 0) {
-          <button
-            (click)="approveOrder(order.id)"
-            class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 mx-2"
-          >
-            قبول
-          </button>
-          <button
-            (click)="openModal('reject', order.id)"
-            class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            رفض
-          </button>
-          } @else if(order.status === 1) {
-          <span class="text-gray-500">Accepted</span>
-          } @else if (order.status === 2) {
-          <span class="text-gray-500">Rejected</span>
-          }
-        </td>
-      </tr>
-      } @if (!filteredOrders().length) {
-      <tr>
-        <td colspan="7" class="py-2 px-4 text-center">لا توجد طلبات</td>
-      </tr>
-      }
-    </tbody>
-  </table>
+
+  <!-- Orders Table -->
+  <div
+    *ngIf="currentFilter() === 'orders' || currentFilter() === 'pendingOrders'"
+  >
+    <table class="min-w-full bg-white border-collapse">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b">رقم العميل</th>
+          <th class="py-2 px-4 border-b">تاريخ الطلب</th>
+          <th class="py-2 px-4 border-b">الأصناف</th>
+          <th class="py-2 px-4 border-b">المجموع</th>
+          <th class="py-2 px-4 border-b">الحالة</th>
+          <th class="py-2 px-4 border-b">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of filteredOrders(); track trackByOrder($index, order)) {
+        <tr class="text-center">
+          <td class="py-2 px-4 border-b">{{ order.customerNumber }}</td>
+          <td class="py-2 px-4 border-b">
+            {{ convertToEgyptTime(order.orderDate) }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            @for (item of order.orderItems; track trackByItem($index, item)) {
+            <div>{{ getItemName(item.menuItemId) }} ({{ item.quantity }})</div>
+            }
+          </td>
+          <td class="py-2 px-4 border-b">{{ order.totalAmount }} جنيه</td>
+          <td class="py-2 px-4 border-b">{{ getStatusLabel(order.status) }}</td>
+          <td class="py-2 px-4 border-b space-x-2">
+            @if (order.status === 0) {
+            <button
+              (click)="approveOrder(order.id)"
+              class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 mx-2"
+            >
+              قبول
+            </button>
+            <button
+              (click)="openModal('rejectOrder', order.id)"
+              class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              رفض
+            </button>
+            } @else {
+            <span class="text-gray-500">تم التعامل مع الطلب</span>
+            }
+          </td>
+        </tr>
+        } @if (!filteredOrders().length) {
+        <tr>
+          <td colspan="6" class="py-2 px-4 text-center">
+            {{
+              currentFilter() === "pendingOrders"
+                ? "لا يوجد طلبات معلقة حالياً"
+                : "لا توجد طلبات"
+            }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!--** Assistance Requests Table -->
+  <div
+    *ngIf="
+      currentFilter() === 'assistance' ||
+      currentFilter() === 'assistancePending'
+    "
+  >
+    <table class="min-w-full bg-white border-collapse">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b">اسم الغرفة</th>
+          <th class="py-2 px-4 border-b">نوع المساعدة</th>
+          <th class="py-2 px-4 border-b">تاريخ الطلب</th>
+          <th class="py-2 px-4 border-b">الحالة</th>
+          <th class="py-2 px-4 border-b">سبب الرفض</th>
+          <th class="py-2 px-4 border-b">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (request of filteredAssistanceRequests(); track
+        trackByRequest($index, request)) {
+        <tr class="text-center">
+          <td class="py-2 px-4 border-b">
+            {{ request.roomName || "غير معروف" }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            {{ getAssistanceTypeName(request.requestTypeId) }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            {{ convertToEgyptTime(request.requestDate) }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            {{ getStatusLabel(request.status) }}
+          </td>
+          <td class="py-2 px-4 border-b">
+            {{ request.rejectionReason || "-" }}
+          </td>
+          <td class="py-2 px-4 border-b space-x-2">
+            @if (request.status === 0) {
+            <button
+              (click)="approveAssistanceRequest(request.id)"
+              class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 mx-2"
+            >
+              قبول
+            </button>
+            <button
+              (click)="openModal('rejectAssistance', request.id)"
+              class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              رفض
+            </button>
+            } @else {
+            <span class="text-gray-500">تم التعامل مع الطلب</span>
+            }
+          </td>
+        </tr>
+        } @if (!filteredAssistanceRequests().length) {
+        <tr>
+          <td colspan="6" class="py-2 px-4 text-center">
+            {{
+              currentFilter() === "assistancePending"
+                ? "لا يوجد طلبات مساعدة معلقة حالياً"
+                : "لا توجد طلبات مساعدة"
+            }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 
   <!-- Modal for Reject Reason -->
   @if (showModal()) {
@@ -74,7 +200,9 @@
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
   >
     <div class="bg-white p-6 rounded-lg w-1/3">
-      <h2 class="text-xl mb-4">رفض الطلب</h2>
+      <h2 class="text-xl mb-4">
+        {{ modalAction() === "rejectOrder" ? "رفض الطلب" : "رفض طلب المساعدة" }}
+      </h2>
       <div class="mb-4">
         <input
           [ngModel]="rejectionReason()"
@@ -91,7 +219,11 @@
           إلغاء
         </button>
         <button
-          (click)="rejectOrder()"
+          (click)="
+            modalAction() === 'rejectOrder'
+              ? rejectOrder()
+              : rejectAssistanceRequest()
+          "
           class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
           تأكيد الرفض

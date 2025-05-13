@@ -54,3 +54,15 @@ export interface OrderItem {
   menuItemId: number;
   quantity: number;
 }
+
+export interface RequestDto {
+  id: number;
+  customerId: number | null;
+  roomId: number;
+  roomName: string;
+  storeId: number;
+  requestTypeId: number;
+  status: number;
+  rejectionReason: string;
+  requestDate: string;
+}
