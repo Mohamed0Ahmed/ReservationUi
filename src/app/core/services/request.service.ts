@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../env/enviroment';
 import { AuthService } from './auth.service';
 import { ApiResponse, RequestDto } from '../../interface/interfaces';
-import { NotificationService } from './notification.service';
+import { environment } from '../../env/enviroment';
 
 @Injectable({
   providedIn: 'root',
@@ -12,15 +11,21 @@ import { NotificationService } from './notification.service';
 export class RequestService {
   private apiUrl = `${environment.apiUrl}/assistance/request`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private notificationService: NotificationService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   private getStoreId(): number | null {
     const storeId = this.authService.getStoreId();
     return storeId ? parseInt(storeId) : null;
+  }
+
+  createAssistanceRequest(request: {
+    roomId: number;
+    requestTypeId: number;
+  }): Observable<ApiResponse<RequestDto>> {
+    return this.http.post<ApiResponse<RequestDto>>(
+      `${this.apiUrl}/create`,
+      request
+    );
   }
 
   getPendingAssistanceRequests(

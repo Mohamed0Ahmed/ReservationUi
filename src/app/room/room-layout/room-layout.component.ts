@@ -4,11 +4,12 @@ import { NotificationService } from '../../core/services/notification.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
+import { SidenavComponent } from '../sidenav/sidenav.component';
 
 @Component({
   selector: 'app-room-layout',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, SidenavComponent],
   templateUrl: './room-layout.component.html',
   styleUrl: './room-layout.component.css',
 })
@@ -26,7 +27,6 @@ export class RoomLayoutComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.authService.isLoggedIn() && this.authService.getRoomId()) {
       this.currentRoomId = this.authService.getRoomId();
-
       this.startConnection();
     }
   }
