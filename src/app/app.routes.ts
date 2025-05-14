@@ -13,6 +13,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { RoomLoginComponent } from './room/room-login/room-login.component';
 import { HomeComponent } from './room/home/home.component';
 import { RoomLayoutComponent } from './room/room-layout/room-layout.component';
+import { ownerGuard } from './core/guards/owner.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -41,6 +42,7 @@ export const routes: Routes = [
   {
     path: 'owner',
     component: OwnerDashboardComponent,
+    canActivate: [ownerGuard],
     children: [
       { path: '', redirectTo: 'orders', pathMatch: 'full' },
       { path: 'assistance', component: AssistanceComponent },

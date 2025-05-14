@@ -14,7 +14,7 @@ export class AuthService {
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
   private userRole: string | null = null;
   private storeId: string | null = null;
-  private roomId: string | null = null; 
+  private roomId: string | null = null;
 
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('token');
@@ -106,7 +106,7 @@ export class AuthService {
 
   getRoomId(): string | null {
     return this.roomId;
-  } // دالة جديدة لـ roomId
+  }
 
   logout(): void {
     localStorage.removeItem('token');

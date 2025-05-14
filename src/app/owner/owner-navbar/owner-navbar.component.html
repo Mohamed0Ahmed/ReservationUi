@@ -30,6 +30,12 @@
         المساعدات
       </a>
       <button
+        (click)="openPointSettingsModal()"
+        class="px-3 py-2 hover:text-blue-300 transition"
+      >
+        إعدادات النقاط
+      </button>
+      <button
         (click)="logout()"
         class="px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
       >
@@ -38,3 +44,9 @@
     </div>
   </nav>
 </header>
+
+@if (showPointSettingsModal) {
+<app-point-settings-modal
+  (close)="closePointSettingsModal()"
+></app-point-settings-modal>
+}

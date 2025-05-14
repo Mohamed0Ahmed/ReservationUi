@@ -22,7 +22,7 @@ export class OwnerDashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.notificationService.startConnection().subscribe({
+    this.notificationService.startOwnerConnection().subscribe({
       next: () => {
         this.subscription = this.notificationService.notification$.subscribe(
           (message) => {

@@ -66,3 +66,10 @@ export interface RequestDto {
   rejectionReason: string;
   requestDate: string;
 }
+
+export interface Customer {
+  id: number;
+  phoneNumber: string;
+  storeId: number;
+  points: number;
+}

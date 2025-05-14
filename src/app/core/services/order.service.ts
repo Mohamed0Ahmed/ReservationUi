@@ -12,6 +12,18 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
+  createOrder(
+    phoneNumber: string,
+    roomId: number,
+    items: { menuItemId: number; quantity: number }[]
+  ): Observable<ApiResponse<Order>> {
+    return this.http.post<ApiResponse<Order>>(this.apiUrl, {
+      PhoneNumber: phoneNumber,
+      RoomId: roomId,
+      Items: items,
+    });
+  }
+
   getOrders(storeId: number): Observable<ApiResponse<Order[]>> {
     return this.http.get<ApiResponse<Order[]>>(
       `${this.apiUrl}/store/${storeId}`
