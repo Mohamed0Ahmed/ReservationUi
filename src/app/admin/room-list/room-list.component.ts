@@ -1,12 +1,12 @@
 import { Component, signal, computed } from '@angular/core';
 import { RoomService } from '../../core/services/room.service';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Room } from '../../interface/interfaces';
 import { CreateRoomRequest, UpdateRoomRequest } from '../../interface/DTOs';
 import { debounceTime } from 'rxjs';
 import { Subject } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-rooms-list',
