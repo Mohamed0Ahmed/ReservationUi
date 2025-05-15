@@ -60,9 +60,6 @@
         <div>
           <h3 class="text-lg font-semibold">{{ item.name }}</h3>
           <p class="text-gray-600">السعر: {{ item.price }} جنيه</p>
-          <p class="text-gray-600">
-            النقاط المطلوبة: {{ item.pointsRequired }}
-          </p>
         </div>
         <button
           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
@@ -88,12 +85,12 @@
       @if (cart().length) {
       <div class="space-y-4 max-h-96 overflow-y-auto">
         @for (item of cart(); track item.menuItemId) {
-        <div
-          class="flex justify-between items-center border-b pb-2"
-        >
+        <div class="flex justify-between items-center border-b pb-2">
           <div>
             <p class="font-semibold">{{ item.name }}</p>
-            <p class="text-gray-600">{{ item.price }} جنيه x {{ item.quantity }}</p>
+            <p class="text-gray-600">
+              {{ item.price }} جنيه x {{ item.quantity }}
+            </p>
           </div>
           <div class="flex items-center gap-2">
             <button
@@ -136,10 +133,7 @@
       } @else {
       <p class="text-gray-600">لا توجد طلبات</p>
       }
-      <button
-        class="mt-4 text-gray-600 underline"
-        (click)="closeCartModal()"
-      >
+      <button class="mt-4 text-gray-600 underline" (click)="closeCartModal()">
         إغلاق
       </button>
     </div>

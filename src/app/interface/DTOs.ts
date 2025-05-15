@@ -11,5 +11,4 @@ export interface UpdateRoomRequest {
 export interface UpdateMenuItemRequest {
   name: string;
   price: number;
-  pointsRequired: number;
 }

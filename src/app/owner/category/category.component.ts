@@ -5,13 +5,23 @@ import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UpdateMenuItemRequest } from '../../interface/DTOs';
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'findById',
+  standalone: true,
+})
+export class FindByIdPipe implements PipeTransform {
+  transform(categories: Category[], id: number): Category | undefined {
+    return categories.find((cat) => cat.id === id);
+  }
+}
 
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FindByIdPipe],
   templateUrl: './category.component.html',
-  styleUrl: './category.component.css',
 })
 export class CategoryComponent implements OnInit {
   categories: Category[] = [];
@@ -19,14 +29,12 @@ export class CategoryComponent implements OnInit {
   items: { [key: number]: Item[] } = {};
   deletedItems: { [key: number]: Item[] } = {};
   showDeleted = false;
-  showItems: { [key: number]: boolean } = {};
   newCategoryName = '';
   editCategory: Category | null = null;
   newItem: Item = {
     id: 0,
     name: '',
     price: 0,
-    pointsRequired: 0,
     categoryId: 0,
     storeId: 0,
   };
@@ -49,7 +57,6 @@ export class CategoryComponent implements OnInit {
           this.categories = response.data;
           this.categories.forEach((cat) => {
             this.loadItems(cat.id);
-            this.showItems[cat.id] = false;
           });
         } else {
           this.toastr.error(response.message || 'فشل في جلب الأقسام');
@@ -87,8 +94,12 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  toggleItems(categoryId: number): void {
-    this.showItems[categoryId] = !this.showItems[categoryId];
+  openItemsModal(categoryId: number): void {
+    this.selectedCategoryId = categoryId;
+  }
+
+  closeItemsModal(): void {
+    this.selectedCategoryId = null;
   }
 
   createCategory(): void {
@@ -100,7 +111,6 @@ export class CategoryComponent implements OnInit {
       next: (response) => {
         if (response.isSuccess && response.data) {
           this.categories.push(response.data);
-          this.showItems[response.data.id] = false;
           this.newCategoryName = '';
           this.toastr.success('تم إضافة القسم بنجاح');
         } else {
@@ -176,11 +186,7 @@ export class CategoryComponent implements OnInit {
   }
 
   createItem(categoryId: number): void {
-    if (
-      !this.newItem.name ||
-      this.newItem.price <= 0 ||
-      this.newItem.pointsRequired < 0
-    ) {
+    if (!this.newItem.name || this.newItem.price <= 0) {
       this.toastr.error('يرجى إدخال بيانات الصنف بشكل صحيح');
       return;
     }
@@ -194,7 +200,6 @@ export class CategoryComponent implements OnInit {
             id: 0,
             name: '',
             price: 0,
-            pointsRequired: 0,
             categoryId: 0,
             storeId: 0,
           };
@@ -213,19 +218,13 @@ export class CategoryComponent implements OnInit {
   }
 
   updateItem(): void {
-    if (
-      !this.editItem ||
-      !this.editItem.name ||
-      this.editItem.price <= 0 ||
-      this.editItem.pointsRequired < 0
-    ) {
+    if (!this.editItem || !this.editItem.name || this.editItem.price <= 0) {
       this.toastr.error('يرجى إدخال بيانات الصنف بشكل صحيح');
       return;
     }
     const updateRequest: UpdateMenuItemRequest = {
       name: this.editItem.name,
       price: this.editItem.price,
-      pointsRequired: this.editItem.pointsRequired,
     };
     this.menuService.updateItem(this.editItem.id, updateRequest).subscribe({
       next: (response) => {
