@@ -19,8 +19,8 @@
       class="px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
         currentFilter() === 'orders'
-          ? 'bg-gray-400 text-white'
-          : 'bg-gray-800 text-white'
+          ? 'bg-gray-700 text-white'
+          : 'bg-gray-950 text-white'
       "
     >
       الاوردرات
@@ -30,8 +30,8 @@
       class="relative px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
         currentFilter() === 'pendingOrders'
-          ? 'bg-gray-400 text-white'
-          : 'bg-gray-800 text-white'
+          ? 'bg-gray-700 text-white'
+          : 'bg-gray-950 text-white'
       "
     >
       الأوردرات الحالية
@@ -47,8 +47,8 @@
       class="relative px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
         currentFilter() === 'assistancePending'
-          ? 'bg-gray-400 text-white'
-          : 'bg-gray-800 text-white'
+          ? 'bg-gray-700 text-white'
+          : 'bg-gray-950 text-white'
       "
     >
       طلبات المساعدة الحالية
@@ -63,29 +63,29 @@
       class="px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
         currentFilter() === 'assistance'
-          ? 'bg-gray-400 text-white'
-          : 'bg-gray-800 text-white'
+          ? 'bg-gray-700 text-white'
+          : 'bg-gray-950 text-white'
       "
     >
       طلبات المساعدة
     </button>
   </div>
 
-  <!-- Orders Cards -->
+  <!-- *Orders Cards -->
   <div
     *ngIf="currentFilter() === 'orders' || currentFilter() === 'pendingOrders'"
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"
   >
     @for (order of filteredOrders(); track trackByOrder($index, order)) {
-    <div class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm">
-      <div class="flex border-b border-gray-700 bg-gray-700 rounded-t-lg">
+    <div class="w-full border border-gray-700 rounded-lg shadow-sm">
+      <div class="flex border-b border-gray-700 bg-gray-950 rounded-t-lg">
         <button
           (click)="setActiveTab(order.id, 'details')"
           class="flex-1 p-4 text-sm font-medium"
           [ngClass]="
             activeTab()[order.id] === 'details'
-              ? 'text-blue-500 bg-gray-600'
-              : 'text-gray-400 hover:bg-gray-600'
+              ? 'text-blue-500 '
+              : 'text-gray-400 '
           "
         >
           تفاصيل الطلب
@@ -95,8 +95,8 @@
           class="flex-1 p-4 text-sm font-medium"
           [ngClass]="
             activeTab()[order.id] === 'items'
-              ? 'text-blue-500 bg-gray-600'
-              : 'text-gray-400 hover:bg-gray-600'
+              ? 'text-blue-500 '
+              : 'text-gray-400'
           "
         >
           الأصناف
@@ -195,7 +195,7 @@
   >
     @for (request of filteredAssistanceRequests(); track trackByRequest($index,
     request)) {
-    <div class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm">
+    <div class="w-full  border border-gray-700 rounded-lg shadow-sm">
       <div class="p-4">
         <dl class="space-y-2">
           <div class="flex justify-between">
@@ -204,7 +204,7 @@
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">نوع المساعدة:</dt>
-            <dd class="text-gray-400">
+            <dd class="text-gray-100">
               {{ getAssistanceTypeName(request.requestTypeId) }}
             </dd>
           </div>
@@ -220,7 +220,7 @@
               [ngClass]="{
                 'text-green-500': request.status === 1,
                 'text-red-500': request.status === 2,
-                'text-gray-500': request.status === 0
+                'text-gray-300': request.status === 0
               }"
             >
               {{ getStatusLabel(request.status) }}

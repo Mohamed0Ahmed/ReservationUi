@@ -1,4 +1,4 @@
-<div dir="rtl" class="container mx-auto p-6 bg-gray-800 text-gray-400">
+<div dir="rtl" class="container mx-auto p-6 bg-gray-950 bg-opacity-50">
   <h1 class="text-2xl font-bold text-white mb-6">إدارة الأقسام</h1>
 
   <!-- Form to Add New Category -->
@@ -27,9 +27,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     @for (category of (showDeleted ? deletedCategories : categories); track
     category.id) {
-    <div
-      class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4"
-    >
+    <div class="w-full border border-gray-700 rounded-lg shadow-sm p-4">
       <h3 class="text-lg font-semibold text-white mb-2">{{ category.name }}</h3>
       <div class="flex justify-between items-center">
         <div class="flex space-x-2 space-x-reverse">
@@ -72,10 +70,8 @@
 
   <!-- Items Modal -->
   @if (selectedCategoryId) {
-  <div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-  >
-    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="bg-black p-6 rounded-lg w-full max-w-md">
       <h3 class="text-lg font-semibold text-white mb-4 text-center">
         الأصناف في
         {{ (categories | findById : selectedCategoryId)?.name || "القسم" }}

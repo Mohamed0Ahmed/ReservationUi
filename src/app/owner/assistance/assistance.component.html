@@ -1,4 +1,4 @@
-<div dir="rtl" class="container mx-auto p-6 bg-gray-800 text-gray-400">
+<div dir="rtl" class="container mx-auto p-6  text-gray-400">
   <h1 class="text-2xl font-bold text-white mb-6">أنواع المساعدة</h1>
   <div class="mb-6 flex items-center gap-3">
     <button
@@ -21,12 +21,12 @@
     @if (!showDeleted()) { @for (assistance of assistanceTypes(); track
     assistance.id) {
     <div
-      class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4"
+      class="w-full border border-gray-700 rounded-lg shadow-sm p-4"
     >
       <h3 class="text-lg font-semibold text-white mb-2">
         {{ assistance.name }}
       </h3>
-      <p class="text-sm text-gray-400 mb-2">
+      <p class="text-sm text-gray-100 font-bold mb-2">
         {{ isDefaultAssistance(assistance) ? "افتراضي" : "مخصص" }}
       </p>
       <div class="flex justify-end space-x-2 space-x-reverse">
@@ -44,7 +44,7 @@
           حذف
         </button>
         } @else {
-        <span class="text-gray-500">لا يمكن التعديل</span>
+        <span class="text-gray-300">لا يمكن التعديل</span>
         }
       </div>
     </div>
@@ -53,12 +53,12 @@
     } } @if (showDeleted()) { @for (assistance of deletedAssistanceTypes();
     track assistance.id) {
     <div
-      class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4"
+      class="w-full  border border-gray-700 rounded-lg shadow-sm p-4"
     >
       <h3 class="text-lg font-semibold text-white mb-2">
         {{ assistance.name }}
       </h3>
-      <p class="text-sm text-gray-400 mb-2">مخصص</p>
+      <p class="text-sm text-gray-200 mb-2">مخصص</p>
       <div class="flex justify-end space-x-2 space-x-reverse">
         <button
           (click)="openModal('edit', assistance.id)"

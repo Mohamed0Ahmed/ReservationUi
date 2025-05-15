@@ -16,24 +16,31 @@ export class SidenavComponent implements OnInit {
   assistances: Assistance[] = [];
   selectedAssistance?: Assistance;
   showConfirmModal = false;
+  storeId: number | null = null;
 
   constructor(
     private assistanceService: AssistanceService,
     private authService: AuthService,
     private requestService: RequestService,
     private toastr: ToastrService
-  ) {}
+  ) {
+    this.storeId = parseInt(this.authService.getStoreId() || '0');
+  }
 
   ngOnInit() {
     this.loadAssistances();
   }
 
   loadAssistances() {
-    this.assistanceService.getDefaultAssistanceTypes().subscribe({
+    if (!this.storeId) {
+      this.toastr.error('لم يتم العثور على معرف المتجر', 'خطأ');
+      return;
+    }
+
+    this.assistanceService.getAllAssistanceTypes(this.storeId).subscribe({
       next: (response) => {
         if (response.isSuccess && response.data) {
           this.assistances = response.data;
-          console.log('Loaded assistances:', this.assistances);
         } else {
           this.toastr.error(
             response.message || 'فشل تحميل أنواع المساعدة',

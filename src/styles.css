@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 1) 100%),
+    url("./assets/images/opera__gx--hero.1d817bdb8ff5.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  min-height: [100vh-80px];
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}

@@ -4,12 +4,11 @@ import { NotificationService } from '../../core/services/notification.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
-import { SidenavComponent } from '../sidenav/sidenav.component';
 
 @Component({
   selector: 'app-room-layout',
   standalone: true,
-  imports: [RouterOutlet, SidenavComponent],
+  imports: [RouterOutlet],
   templateUrl: './room-layout.component.html',
   styleUrl: './room-layout.component.css',
 })

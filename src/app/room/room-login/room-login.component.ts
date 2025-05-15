@@ -58,7 +58,7 @@ export class RoomLoginComponent {
           }
         },
         error: (error) => {
-          this.message.set(error.message || 'حدث خطأ أثناء تسجيل الدخول');
+          this.message.set( 'حدث خطأ أثناء تسجيل الدخول');
         },
       });
   }
