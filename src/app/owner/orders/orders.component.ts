@@ -1,5 +1,5 @@
 import { Component, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { OrderService } from '../../core/services/order.service';
@@ -20,7 +20,7 @@ import { AssistanceService } from '../../core/services/Assistance.service';
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgClass],
   templateUrl: './orders.component.html',
 })
 export class OrdersComponent implements OnDestroy {
@@ -36,6 +36,7 @@ export class OrdersComponent implements OnDestroy {
   currentFilter = signal<
     'orders' | 'pendingOrders' | 'assistance' | 'assistancePending'
   >('pendingOrders');
+  activeTab = signal<{ [key: number]: 'details' | 'items' }>({});
   filteredOrders = computed(() => {
     if (this.currentFilter() === 'orders') {
       return this.orders();
@@ -76,12 +77,23 @@ export class OrdersComponent implements OnDestroy {
     );
   }
 
+  setActiveTab(id: number, tab: 'details' | 'items') {
+    this.activeTab.update((tabs) => ({ ...tabs, [id]: tab }));
+  }
+
   loadOrders() {
     if (!this.storeId()) return;
     this.orderService.getOrders(this.storeId()!).subscribe({
       next: (res) => {
         if (res.isSuccess && res.data) {
           this.orders.set(res.data.reverse());
+          const updatedTabs = { ...this.activeTab() };
+          res.data.forEach((order) => {
+            if (!updatedTabs[order.id]) {
+              updatedTabs[order.id] = 'details';
+            }
+          });
+          this.activeTab.set(updatedTabs);
         }
       },
       error: () => {
@@ -96,6 +108,13 @@ export class OrdersComponent implements OnDestroy {
       next: (res) => {
         if (res.isSuccess && res.data) {
           this.orders.set(res.data);
+          const updatedTabs = { ...this.activeTab() };
+          res.data.forEach((order) => {
+            if (!updatedTabs[order.id]) {
+              updatedTabs[order.id] = 'details';
+            }
+          });
+          this.activeTab.set(updatedTabs);
         }
       },
       error: () => {

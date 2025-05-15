@@ -47,6 +47,7 @@ export interface Order {
   rejectionReason: string;
   orderDate: string;
   orderItems: OrderItem[];
+  roomName: string;
 }
 
 export interface OrderItem {
