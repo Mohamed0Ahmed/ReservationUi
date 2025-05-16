@@ -1,39 +1,34 @@
-<div
-  dir="rtl"
-  class="min-h-screen flex items-center justify-center bg-gray-100"
->
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-      تسجيل الدخول
-    </h2>
+<div dir="rtl" class="min-h-screen flex items-center justify-center">
+  <div class="p-8 rounded-lg shadow-lg w-full max-w-md text-white">
+    <h2 class="text-2xl font-bold text-center mb-6">تسجيل الدخول</h2>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
-        <label for="email" class="block text-sm font-medium text-gray-700"
+        <label for="email" class="block text-sm font-medium"
           >البريد الإلكتروني</label
         >
         <input
           type="email"
           id="email"
           formControlName="email"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full text-black px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (email?.touched && email?.invalid) { @if
         (email?.errors?.['required']) {
-        <div class="text-red-500 text-sm mt-1">ادخل الإيميل</div>
+        <div class="text-sm text-red-600 mt-1">ادخل الإيميل</div>
         } @else if (email?.errors?.['email']) {
-        <div class="text-red-500 text-sm mt-1">الإيميل غير صحيح</div>
+        <div class="text-sm text-red-600 mt-1">الإيميل غير صحيح</div>
         } }
       </div>
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700"
+        <label for="password" class="block text-sm font-medium"
           >كلمة المرور</label
         >
         <input
           type="password"
           id="password"
           formControlName="password"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (password?.touched && password?.invalid) { @if
         (password?.errors?.['required']) {
@@ -44,13 +39,13 @@
       </div>
       <button
         type="submit"
-        class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         تسجيل دخول
       </button>
 
       <div class="text-center mt-4 font-bold cursor-pointer">
-        <a routerLink="/register" class="text-blue-600">تسجيل حساب جديد</a>
+        <a routerLink="/register" class="text-red-600">تسجيل حساب جديد</a>
       </div>
     </form>
   </div>

@@ -1,22 +1,22 @@
 <div
   dir="rtl"
-  class="min-h-screen flex items-center justify-center bg-gray-100"
+  class="min-h-screen flex items-center justify-center text-white "
 >
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+  <div class=" p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-6 ">
       تسجيل دخول الغرفة
     </h2>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
-        <label for="storeName" class="block text-sm font-medium text-gray-700">
+        <label for="storeName" class="block text-sm font-medium ">
           اسم المحل
         </label>
         <input
           type="text"
           id="storeName"
           formControlName="storeName"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 text-black py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (storeName?.touched && storeName?.invalid) { @if
         (storeName?.errors?.['required']) {
@@ -25,14 +25,14 @@
       </div>
 
       <div>
-        <label for="username" class="block text-sm font-medium text-gray-700">
+        <label for="username" class="block text-sm font-medium ">
           اسم المستخدم
         </label>
         <input
           type="text"
           id="username"
           formControlName="username"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (username?.touched && username?.invalid) { @if
         (username?.errors?.['required']) {
@@ -41,14 +41,14 @@
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">
+        <label for="password" class="block text-sm font-medium ">
           كلمة المرور
         </label>
         <input
           type="password"
           id="password"
           formControlName="password"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (password?.touched && password?.invalid) { @if
         (password?.errors?.['required']) {

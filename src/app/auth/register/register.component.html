@@ -1,21 +1,18 @@
-<div
-  dir="rtl"
-  class="min-h-screen flex items-center justify-center bg-gray-100"
->
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+<div dir="rtl" class="min-h-screen flex items-center justify-center">
+  <div class="text-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-6 text-white">
       إنشاء حساب جديد
     </h2>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">
+        <label for="email" class="block text-sm font-medium">
           البريد الإلكتروني
         </label>
         <input
           type="email"
           id="email"
           formControlName="email"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 text-black py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (email?.touched && email?.invalid) { @if
         (email?.errors?.['required']) {
@@ -26,14 +23,14 @@
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">
+        <label for="password" class="block text-sm font-medium">
           كلمة المرور
         </label>
         <input
           type="password"
           id="password"
           formControlName="password"
-          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="mt-1 w-full px-4 text-black py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         @if (password?.touched && password?.invalid) { @if
         (password?.errors?.['required']) {
@@ -45,13 +42,13 @@
 
       <button
         type="submit"
-        class="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-green-500"
       >
         تسجيل حساب
       </button>
 
       <div class="text-center mt-4 font-bold">
-        <a routerLink="/login" class="text-blue-600">تسجيل دخول</a>
+        <a routerLink="/login" class="text-red-600">تسجيل دخول</a>
       </div>
     </form>
   </div>
