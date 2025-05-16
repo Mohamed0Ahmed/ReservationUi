@@ -4,19 +4,29 @@ import { RequestService } from '../../core/services/request.service';
 import { ToastrService } from 'ngx-toastr';
 import { Assistance } from '../../interface/interfaces';
 import { AssistanceService } from '../../core/services/Assistance.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './sidenav.component.html',
-  styleUrl: './sidenav.component.css',
+  styleUrls: ['./sidenav.component.css'],
 })
 export class SidenavComponent implements OnInit {
   assistances: Assistance[] = [];
   selectedAssistance?: Assistance;
   showConfirmModal = false;
   storeId: number | null = null;
+  isSidenavOpen = false;
+
+  private iconMap: { [key: number]: string } = {
+    5: 'fa-battery-quarter',
+    3: 'fa-display',
+    4: 'fa-question',
+    2: 'fa-gamepad',
+    1: 'fa-arrows-rotate',
+  };
 
   constructor(
     private assistanceService: AssistanceService,
@@ -40,7 +50,7 @@ export class SidenavComponent implements OnInit {
     this.assistanceService.getAllAssistanceTypes(this.storeId).subscribe({
       next: (response) => {
         if (response.isSuccess && response.data) {
-          this.assistances = response.data;
+          this.assistances = response.data.reverse();
         } else {
           this.toastr.error(
             response.message || 'فشل تحميل أنواع المساعدة',
@@ -53,6 +63,13 @@ export class SidenavComponent implements OnInit {
         this.toastr.error('فشل تحميل أنواع المساعدة', 'خطأ');
       },
     });
+  }
+
+  getIconClass(id: number): string {
+    if (id >= 1000) {
+      return 'fa-gears'; // Owner icon
+    }
+    return this.iconMap[id] || 'fa-question-circle'; // Admin icon or default
   }
 
   confirmRequest(assistance: Assistance) {
@@ -98,5 +115,13 @@ export class SidenavComponent implements OnInit {
   cancelRequest() {
     this.showConfirmModal = false;
     this.selectedAssistance = undefined;
+  }
+
+  toggleSidenav() {
+    this.isSidenavOpen = !this.isSidenavOpen;
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.classList.toggle('sidenav-open', this.isSidenavOpen);
+    }
   }
 }

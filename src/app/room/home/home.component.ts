@@ -13,11 +13,12 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../core/services/auth.service';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
+import { SidenavComponent } from "../sidenav/sidenav.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, CarouselModule],
+  imports: [CommonModule, FormsModule, CarouselModule, SidenavComponent],
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -203,7 +204,7 @@ export class HomeComponent implements OnInit {
           currentChunk.push(currentGroup);
         }
 
-        if (currentCount < 8) {
+        if (currentCount < 12) {
           currentGroup.items.push(item);
           currentCount++;
           itemIndex++;
@@ -225,8 +226,8 @@ export class HomeComponent implements OnInit {
       }
     } else {
       const allItems = this.items();
-      for (let i = 0; i < allItems.length; i += 8) {
-        chunks.push({ items: allItems.slice(i, i + 8) });
+      for (let i = 0; i < allItems.length; i += 12) {
+        chunks.push({ items: allItems.slice(i, i + 12) });
       }
     }
 
@@ -334,6 +335,7 @@ export class HomeComponent implements OnInit {
             this.toastr.success('تم إرسال الطلب بنجاح', 'نجاح');
             this.clearCart();
             this.closeLoginModal();
+            this.closeCartModal();
           } else {
             this.toastr.error(response.message || 'فشل إرسال الطلب', 'خطأ');
             this.showLoginModal.set(true);

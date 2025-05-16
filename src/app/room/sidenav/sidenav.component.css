@@ -1,0 +1,18 @@
+.sidenav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.help-button {
+  z-index: 999;
+}
+
+.main-content {
+  transition: transform 0.3s ease;
+}
+
+.main-content.sidenav-open {
+  transform: translateX(-44px);
+}
