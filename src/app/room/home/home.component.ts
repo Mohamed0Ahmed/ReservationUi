@@ -13,7 +13,8 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../core/services/auth.service';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
-import { SidenavComponent } from "../sidenav/sidenav.component";
+import { SidenavComponent } from '../sidenav/sidenav.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -56,7 +57,8 @@ export class HomeComponent implements OnInit {
     private customerService: CustomerService,
     private orderService: OrderService,
     private toastr: ToastrService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.storeId = this.authService.getStoreId()
       ? parseInt(this.authService.getStoreId()!)
@@ -69,7 +71,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     if (!this.storeId || !this.roomId) {
       this.toastr.error('فشل تحميل بيانات الغرفة، سجل دخول مرة أخرى', 'خطأ');
-      this.authService.logout();
+      this.router.navigate(['/room/login']);
       return;
     }
     this.loadCategories();
@@ -297,28 +299,34 @@ export class HomeComponent implements OnInit {
   clearCart(): void {
     this.cart.set([]);
     this.showCartModal.set(false);
-    this.toastr.success('تم إفراغ السلة');
   }
 
   submitLogin(): void {
-    if (!this.phoneNumber().trim()) {
+    const phone = this.phoneNumber().trim();
+    const egyptianPhoneRegex = /^(010|011|012|015)[0-9]{8}$/;
+
+    if (!phone) {
       this.toastr.error('يرجى إدخال رقم التليفون', 'خطأ');
       return;
     }
-    this.customerService
-      .loginCustomer(this.phoneNumber(), this.storeId)
-      .subscribe({
-        next: (response) => {
-          if (response.isSuccess && response.data) {
-            this.submitOrder();
-          } else {
-            this.toastr.error(response.message || 'فشل تسجيل الدخول', 'خطأ');
-          }
-        },
-        error: () => {
-          this.toastr.error('خطأ في الاتصال بالخادم', 'خطأ');
-        },
-      });
+
+    if (!egyptianPhoneRegex.test(phone)) {
+      this.toastr.error('من فضلك أدخل رقم تليفون صحيح', 'خطأ');
+      return;
+    }
+
+    this.customerService.loginCustomer(phone, this.storeId).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.submitOrder();
+        } else {
+          this.toastr.error(response.message || 'فشل تسجيل الدخول', 'خطأ');
+        }
+      },
+      error: () => {
+        this.toastr.error('حاول مرة اخري', 'خطأ');
+      },
+    });
   }
 
   submitOrder(): void {

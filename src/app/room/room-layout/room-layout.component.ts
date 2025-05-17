@@ -4,7 +4,6 @@ import { NotificationService } from '../../core/services/notification.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
-import { SidenavComponent } from "../sidenav/sidenav.component";
 
 @Component({
   selector: 'app-room-layout',
@@ -43,7 +42,6 @@ export class RoomLayoutComponent implements OnInit, OnDestroy {
           'Connection State:',
           this.notificationService.getConnectionState()
         );
-        this.toastr.error('فشل الاتصال بخدمة الإشعارات', 'خطأ');
         setTimeout(() => this.startConnection(), 5000);
       },
     });
@@ -57,15 +55,17 @@ export class RoomLayoutComponent implements OnInit, OnDestroy {
       (data) => {
         if (data && String(data.roomId) === String(this.currentRoomId)) {
           if (data.message.includes('تم الموافقة')) {
-            this.toastr.success(data.message, 'نجاح');
-            this.audio
-              .play()
-              .catch((err) => console.error('Audio play failed:', err));
+            this.toastr.success(data.message, 'نجاح', {
+              disableTimeOut: true,
+              tapToDismiss: true,
+            });
+            this.audio.play();
           } else {
-            this.toastr.error(data.message, 'خطأ');
-            this.audio
-              .play()
-              .catch((err) => console.error('Audio play failed:', err));
+            this.toastr.error(data.message, 'خطأ', {
+              disableTimeOut: true,
+              tapToDismiss: true,
+            });
+            this.audio.play();
           }
         }
       }
