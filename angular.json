@@ -13,17 +13,33 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/reservation",
+            "outputPath": "docs",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "node_modules/ngx-toastr/toastr.css",
-              "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.carousel.min.css",
-              "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.theme.default.min.css",
+              {
+                "input": "node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css",
+                "bundleName": "fontawesome-core"
+              },
+              {
+                "input": "node_modules/@fortawesome/fontawesome-free/css/solid.min.css",
+                "bundleName": "fontawesome-solid"
+              },
+              {
+                "input": "node_modules/ngx-toastr/toastr.css",
+                "bundleName": "toastr"
+              },
+              {
+                "input": "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.carousel.min.css",
+                "bundleName": "owl-carousel"
+              },
+              {
+                "input": "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.theme.default.min.css",
+                "bundleName": "owl-theme"
+              },
               "src/styles.css"
             ],
             "scripts": []
@@ -42,7 +58,13 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true
             },
             "development": {
               "optimization": false,

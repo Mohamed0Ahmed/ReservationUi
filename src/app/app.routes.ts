@@ -1,53 +1,70 @@
-import { DashboardComponent } from './admin/dashboard/dashboard.component';
-import { LoginComponent } from './auth/login/login.component';
 import { Routes } from '@angular/router';
-import { StoreListComponent } from './admin/store-list/store-list.component';
 import { adminGuard } from './core/guards/admin.guard';
-import { RoomListComponent } from './admin/room-list/room-list.component';
-import { DefaultAssistanceComponent } from './admin/default-assistance/default-assistance.component';
-import { OwnerDashboardComponent } from './owner/owner-dashboard/owner-dashboard.component';
-import { AssistanceComponent } from './owner/assistance/assistance.component';
-import { CategoryComponent } from './owner/category/category.component';
-import { OrdersComponent } from './owner/orders/orders.component';
-import { RegisterComponent } from './auth/register/register.component';
-import { RoomLoginComponent } from './room/room-login/room-login.component';
-import { HomeComponent } from './room/home/home.component';
-import { RoomLayoutComponent } from './room/room-layout/room-layout.component';
 import { ownerGuard } from './core/guards/owner.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
+  {
+    path: 'login',
+    loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
+  },
   {
     path: 'room',
-    component: RoomLayoutComponent,
+    loadComponent: () => import('./room/room-layout/room-layout.component').then(m => m.RoomLayoutComponent),
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
-      { path: 'login', component: RoomLoginComponent },
-    ],
+      {
+        path: 'home',
+        loadComponent: () => import('./room/home/home.component').then(m => m.HomeComponent)
+      },
+      {
+        path: 'login',
+        loadComponent: () => import('./room/room-login/room-login.component').then(m => m.RoomLoginComponent)
+      }
+    ]
   },
   {
     path: 'admin',
-    component: DashboardComponent,
     canActivate: [adminGuard],
+    loadComponent: () => import('./admin/dashboard/dashboard.component').then(m => m.DashboardComponent),
     children: [
       { path: '', redirectTo: 'stores', pathMatch: 'full' },
-      { path: 'stores', component: StoreListComponent },
-      { path: 'rooms', component: RoomListComponent },
-      { path: 'default-assistance', component: DefaultAssistanceComponent },
-    ],
+      {
+        path: 'stores',
+        loadComponent: () => import('./admin/store-list/store-list.component').then(m => m.StoreListComponent)
+      },
+      {
+        path: 'rooms',
+        loadComponent: () => import('./admin/room-list/room-list.component').then(m => m.RoomListComponent)
+      },
+      {
+        path: 'default-assistance',
+        loadComponent: () => import('./admin/default-assistance/default-assistance.component').then(m => m.DefaultAssistanceComponent)
+      }
+    ]
   },
   {
     path: 'owner',
-    component: OwnerDashboardComponent,
+    loadComponent: () => import('./owner/owner-dashboard/owner-dashboard.component').then(m => m.OwnerDashboardComponent),
     canActivate: [ownerGuard],
     children: [
       { path: '', redirectTo: 'orders', pathMatch: 'full' },
-      { path: 'assistance', component: AssistanceComponent },
-      { path: 'category', component: CategoryComponent },
-      { path: 'orders', component: OrdersComponent },
+      {
+        path: 'assistance',
+        loadComponent: () => import('./owner/assistance/assistance.component').then(m => m.AssistanceComponent)
+      },
+      {
+        path: 'category',
+        loadComponent: () => import('./owner/category/category.component').then(m => m.CategoryComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./owner/orders/orders.component').then(m => m.OrdersComponent)
+      },
     ],
   },
 ];
