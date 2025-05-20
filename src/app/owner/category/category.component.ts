@@ -62,7 +62,7 @@ export class CategoryComponent implements OnInit {
           this.toastr.error(response.message || 'فشل في جلب الأقسام');
         }
       },
-      error: () => this.toastr.error('فشل في جلب الأقسام'),
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
 
     this.menuService.getDeletedCategories().subscribe({
@@ -71,7 +71,6 @@ export class CategoryComponent implements OnInit {
           this.deletedCategories = response.data;
         }
       },
-      error: () => this.toastr.error('فشل في جلب الأقسام المحذوفة'),
     });
   }
 
@@ -90,7 +89,6 @@ export class CategoryComponent implements OnInit {
           this.deletedItems[categoryId] = response.data;
         }
       },
-      error: () => this.toastr.error('فشل في جلب الأصناف المحذوفة'),
     });
   }
 
@@ -114,10 +112,10 @@ export class CategoryComponent implements OnInit {
           this.newCategoryName = '';
           this.toastr.success('تم إضافة القسم بنجاح');
         } else {
-          this.toastr.error(response.message || 'فشل في إضافة القسم');
+          this.toastr.error('فشل في إضافة القسم');
         }
       },
-      error: () => this.toastr.error('فشل في إضافة القسم'),
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 

@@ -36,9 +36,7 @@ export class OwnerDashboardComponent implements OnInit, OnDestroy {
           }
         );
       },
-      error: (err) => {
-        this.toastr.error('فشل الاتصال بخدمة الإشعارات', 'خطأ');
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 

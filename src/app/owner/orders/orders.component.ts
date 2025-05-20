@@ -38,19 +38,42 @@ export class OrdersComponent implements OnDestroy {
   >('pendingOrders');
   activeTab = signal<{ [key: number]: 'details' | 'items' }>({});
   filteredOrders = computed(() => {
+    const allOrders = this.orders();
     if (this.currentFilter() === 'orders') {
-      return this.orders();
+      return allOrders;
     }
-    return this.orders().filter((order) => order.status === 0);
+    return allOrders.filter((order) => order.status === 0);
   });
+
   filteredAssistanceRequests = computed(() => {
+    const allRequests = this.assistanceRequests();
     if (this.currentFilter() === 'assistance') {
-      return this.assistanceRequests();
+      return allRequests;
     }
-    return this.assistanceRequests().filter((req) => req.status === 0);
+    return allRequests.filter((req) => req.status === 0);
   });
-  totalOrders = computed(() => this.orders().length);
-  totalAssistanceRequests = computed(() => this.assistanceRequests().length);
+
+  totalOrders = computed(() => {
+    if (this.currentFilter() === 'pendingOrders') {
+      return this.pendingOrdersCount();
+    }
+    return this.orders().length;
+  });
+
+  totalAssistanceRequests = computed(() => {
+    if (this.currentFilter() === 'assistancePending') {
+      return this.pendingAssistanceCount();
+    }
+    return this.assistanceRequests().length;
+  });
+
+  pendingOrdersCount = computed(
+    () => this.orders().filter((order) => order.status === 0).length
+  );
+
+  pendingAssistanceCount = computed(
+    () => this.assistanceRequests().filter((req) => req.status === 0).length
+  );
   private subscription: Subscription | null = null;
 
   constructor(
@@ -97,7 +120,7 @@ export class OrdersComponent implements OnDestroy {
         }
       },
       error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل الطلبات');
+        this.toastr.error('تحقق من الانترنت الخاص بك');
       },
     });
   }
@@ -118,7 +141,6 @@ export class OrdersComponent implements OnDestroy {
         }
       },
       error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل الطلبات المعلقة');
       },
     });
   }
@@ -132,7 +154,6 @@ export class OrdersComponent implements OnDestroy {
         }
       },
       error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل طلبات المساعدة');
       },
     });
   }
@@ -148,7 +169,6 @@ export class OrdersComponent implements OnDestroy {
           }
         },
         error: () => {
-          this.toastr.error('حدث خطأ أثناء تحميل طلبات المساعدة المعلقة');
         },
       });
   }
@@ -162,7 +182,6 @@ export class OrdersComponent implements OnDestroy {
         }
       },
       error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل الأصناف');
       },
     });
   }
@@ -176,7 +195,6 @@ export class OrdersComponent implements OnDestroy {
         }
       },
       error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل أنواع المساعدة');
       },
     });
   }
@@ -206,8 +224,6 @@ export class OrdersComponent implements OnDestroy {
     } else if (message.includes('طلب مساعدة')) {
       if (this.currentFilter() === 'assistance') {
         this.loadAssistanceRequests();
-      } else if (this.currentFilter() === 'assistancePending') {
-        this.loadPendingAssistanceRequests();
       }
     }
   }
@@ -227,10 +243,27 @@ export class OrdersComponent implements OnDestroy {
   }
 
   approveOrder(orderId: number) {
+    this.selectedId.set(orderId);
+
     this.orderService.approveOrder(orderId).subscribe({
       next: (res) => {
         if (res.isSuccess) {
-          this.refreshData('طلب جديد');
+          this.orders.update((orders) => {
+            return orders.map((order) => {
+              if (order.id === orderId) {
+                return { ...order, status: 1 };
+              }
+              return order;
+            });
+          });
+
+          const pendingCount = this.pendingOrdersCount();
+          console.log('Pending orders after update:', pendingCount);
+
+          if (pendingCount === 0) {
+            this.loadPendingOrders();
+          }
+
           this.toastr.success(res.message || 'تم الموافقة على الطلب بنجاح');
         } else {
           this.toastr.error(res.message || 'فشل العملية');
@@ -243,10 +276,27 @@ export class OrdersComponent implements OnDestroy {
   }
 
   approveAssistanceRequest(requestId: number) {
+    this.selectedId.set(requestId);
+
     this.requestService.approveAssistanceRequest(requestId).subscribe({
       next: (res) => {
         if (res.isSuccess) {
-          this.refreshData('طلب مساعدة');
+          this.assistanceRequests.update((requests) => {
+            return requests.map((req) => {
+              if (req.id === requestId) {
+                return { ...req, status: 1 };
+              }
+              return req;
+            });
+          });
+
+          const pendingCount = this.pendingAssistanceCount();
+          console.log('Pending requests after update:', pendingCount);
+
+          if (pendingCount === 0) {
+            this.loadPendingAssistanceRequests();
+          }
+
           this.toastr.success(
             res.message || 'تم الموافقة على طلب المساعدة بنجاح'
           );

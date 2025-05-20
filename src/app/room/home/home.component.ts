@@ -88,9 +88,7 @@ export class HomeComponent implements OnInit {
           this.error.set(response.message || 'فشل تحميل الأقسام');
         }
       },
-      error: () => {
-        this.error.set('خطأ في الاتصال بالخادم');
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -323,9 +321,7 @@ export class HomeComponent implements OnInit {
           this.toastr.error(response.message || 'فشل تسجيل الدخول', 'خطأ');
         }
       },
-      error: () => {
-        this.toastr.error('حاول مرة اخري', 'خطأ');
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -345,13 +341,13 @@ export class HomeComponent implements OnInit {
             this.closeLoginModal();
             this.closeCartModal();
           } else {
-            this.toastr.error(response.message || 'فشل إرسال الطلب', 'خطأ');
+            this.toastr.error('فشل إرسال الطلب', 'خطأ');
             this.showLoginModal.set(true);
           }
         },
         error: () => {
-          this.toastr.error('خطأ في الاتصال بالخادم', 'خطأ');
-          this.showLoginModal.set(true);
+          this.toastr.error('تحقق من الانترنت الخاص بك'),
+            this.showLoginModal.set(true);
         },
       });
   }

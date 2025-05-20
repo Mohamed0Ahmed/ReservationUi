@@ -24,6 +24,8 @@ export class AuthService {
       this.storeId = storeId;
       this.roomId = roomId;
       this.isLoggedInSubject.next(true);
+
+      this.redirectBasedOnRole();
     }
   }
 
@@ -98,6 +100,18 @@ export class AuthService {
 
   getRole(): string | null {
     return this.userRole;
+  }
+
+  private redirectBasedOnRole() {
+    if (this.router.url === '/login') {
+      if (this.userRole === 'Admin') {
+        this.router.navigate(['/admin']);
+      } else if (this.userRole === 'Owner') {
+        this.router.navigate(['/owner']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    }
   }
 
   getStoreId(): string | null {

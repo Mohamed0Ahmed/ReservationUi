@@ -57,9 +57,7 @@ export class RoomLoginComponent {
             this.message.set(res.message || 'فشل تسجيل الدخول');
           }
         },
-        error: (error) => {
-          this.message.set( 'حدث خطأ أثناء تسجيل الدخول');
-        },
+        error: () => this.message.set('تحقق من الانترنت الخاص بك'),
       });
   }
 }

@@ -21,8 +21,11 @@ export class LoginComponent {
   loginForm: FormGroup;
   message = signal<string>('');
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
-    this.loginForm = this.fb.group({
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService
+  ) {
+    this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
@@ -45,12 +48,12 @@ export class LoginComponent {
     this.message.set('');
     this.authService.login(this.email?.value, this.password?.value).subscribe({
       next: (res: LoginResponse) => {
-        if (res.isSuccess === false) {
+        if (!res.isSuccess) {
           this.message.set(res.message || 'فشل تسجيل الدخول');
         }
       },
-      error: (error) => {
-        this.message.set( 'حدث خطأ أثناء تسجيل الدخول');
+      error: () => {
+        this.message.set('تحقق من الانترنت الخاص بك');
       },
     });
   }

@@ -42,10 +42,7 @@ export class PointSettingsModalComponent implements OnInit {
           console.log('No point settings found, ready to create new.');
         }
       },
-      error: (err) => {
-        console.error('Failed to load point settings:', err);
-        this.toastr.error('فشل تحميل إعدادات النقاط', 'خطأ');
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -59,12 +56,11 @@ export class PointSettingsModalComponent implements OnInit {
       this.pointSettingsService
         .updatePointSetting(this.settingId, this.amount, this.points)
         .subscribe({
-          next: (response) => {
+          next: () => {
             this.toastr.success('تم تعديل إعدادات النقاط بنجاح', 'نجاح');
             this.closeModal();
           },
-          error: (err) => {
-            console.error('Failed to update point settings:', err);
+          error: () => {
             this.toastr.error('فشل تعديل إعدادات النقاط', 'خطأ');
           },
         });
@@ -72,7 +68,7 @@ export class PointSettingsModalComponent implements OnInit {
       this.pointSettingsService
         .createPointSetting(this.amount, this.points)
         .subscribe({
-          next: (response) => {
+          next: () => {
             this.toastr.success('تم إضافة إعدادات النقاط بنجاح', 'نجاح');
             this.closeModal();
           },

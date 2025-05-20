@@ -1,0 +1,137 @@
+<div dir="rtl" class="container mx-auto p-6 text-gray-400">
+  <h1 class="text-2xl font-bold text-white mb-6">الهدايا</h1>
+  <div class="mb-6 flex items-center gap-3">
+    <button
+      (click)="toggleShowDeleted()"
+      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+    >
+      {{ showDeleted() ? "عرض النشط" : "عرض المحذوف" }}
+    </button>
+    <button
+      (click)="openModal('add')"
+      class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+      [disabled]="!storeId()"
+    >
+      إضافة هدية
+    </button>
+  </div>
+
+  <!--* Gift Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @if (!showDeleted()) { @for (gift of gifts(); track gift.id) {
+    <div class="w-full border border-gray-700 rounded-lg shadow-sm p-4">
+      <h3 class="text-lg font-semibold text-white mb-2">{{ gift.name }}</h3>
+      <p class="text-sm text-gray-100 font-bold mb-2">
+        {{ gift.pointsRequired }} نقطة
+      </p>
+      <div class="flex justify-end space-x-2 space-x-reverse">
+        <button
+          (click)="openModal('edit', gift.id)"
+          class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          تعديل
+        </button>
+        <button
+          (click)="openModal('delete', gift.id)"
+          class="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+        >
+          حذف
+        </button>
+      </div>
+    </div>
+    } @if (!gifts().length) {
+    <div class="text-center text-gray-400 p-4">لا توجد هدايا نشطة</div>
+    } } @if (showDeleted()) { @for (gift of deletedGifts(); track gift.id) {
+    <div class="w-full border border-gray-700 rounded-lg shadow-sm p-4">
+      <h3 class="text-lg font-semibold text-white mb-2">{{ gift.name }}</h3>
+      <p class="text-sm text-gray-100 font-bold mb-2">
+        {{ gift.pointsRequired }} نقطة
+      </p>
+      <div class="flex justify-end space-x-2 space-x-reverse">
+        <button
+          (click)="openModal('edit', gift.id)"
+          class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          تعديل
+        </button>
+        <button
+          (click)="openModal('restore', gift.id)"
+          class="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+        >
+          استعادة
+        </button>
+      </div>
+    </div>
+    } @if (!deletedGifts().length) {
+    <div class="text-center text-gray-400 p-4">لا توجد هدايا محذوفة</div>
+    } }
+  </div>
+
+  <!-- Modal -->
+  @if (showModal()) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+  >
+    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm">
+      <h2 class="text-xl font-bold text-white mb-4">
+        {{
+          modalAction() === "add"
+            ? "إضافة"
+            : modalAction() === "edit"
+            ? "تعديل"
+            : modalAction() === "delete"
+            ? "تأكيد الحذف"
+            : "استعادة"
+        }}
+        هدية
+      </h2>
+      @if (modalAction() !== 'delete' && modalAction() !== 'restore') {
+      <div class="mb-4">
+        <input
+          [ngModel]="newGiftName()"
+          (ngModelChange)="newGiftName.set($event)"
+          placeholder="اسم الهدية"
+          class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          type="number"
+          [ngModel]="newGiftPoints()"
+          (ngModelChange)="newGiftPoints.set($event)"
+          placeholder="النقاط المطلوبة"
+          class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      } @if (modalAction() === 'delete') {
+      <p class="mb-4 text-gray-400">هل أنت متأكد من حذف الهدية؟</p>
+      } @if (modalAction() === 'restore') {
+      <p class="mb-4 text-gray-400">هل أنت متأكد من استعادة الهدية؟</p>
+      }
+      <div class="flex justify-end space-x-2 space-x-reverse">
+        <button
+          (click)="closeModal()"
+          class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+        >
+          إلغاء
+        </button>
+        @if (modalAction() !== 'delete' && modalAction() !== 'restore') {
+        <button
+          (click)="saveGift()"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          حفظ
+        </button>
+        } @if (modalAction() === 'delete' || modalAction() === 'restore') {
+        <button
+          (click)="confirmAction()"
+          class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+        >
+          تأكيد
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>

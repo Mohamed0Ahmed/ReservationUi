@@ -73,3 +73,10 @@ export interface Customer {
   storeId: number;
   points: number;
 }
+
+export interface GiftDto {
+  id?: number;
+  name: string;
+  pointsRequired: number;
+  storeId?: number;
+}

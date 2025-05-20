@@ -40,9 +40,7 @@ export class AssistanceComponent {
           this.assistanceTypes.set(res.data);
         }
       },
-      error: () => {
-        this.toastr.error('حدث خطأ أثناء تحميل أنواع المساعدة');
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -59,9 +57,6 @@ export class AssistanceComponent {
               )
             );
           }
-        },
-        error: () => {
-          this.toastr.error('حدث خطأ أثناء تحميل أنواع المساعدة المحذوفة');
         },
       });
   }
@@ -133,12 +128,10 @@ export class AssistanceComponent {
           this.toastr.success(res.message || 'تمت العملية بنجاح');
           this.closeModal();
         } else {
-          this.toastr.error(res.message || 'فشل العملية');
+          this.toastr.error('فشل العملية');
         }
       },
-      error: (err) => {
-        this.toastr.error(err.message);
-      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -161,12 +154,25 @@ export class AssistanceComponent {
     request.subscribe({
       next: (res) => {
         if (res.isSuccess) {
+          if (action === 'restore') {
+            this.deletedAssistanceTypes.set(
+              this.deletedAssistanceTypes().filter((a) => a.id !== assistanceId)
+            );
+          }
           this.loadAssistanceTypes();
           this.loadDeletedAssistanceTypes();
+          setTimeout(() => {
+            if (
+              this.deletedAssistanceTypes().length === 0 &&
+              this.showDeleted()
+            ) {
+              this.loadDeletedAssistanceTypes();
+            }
+          }, 0);
           this.toastr.success(res.message || 'تمت العملية بنجاح');
           this.closeModal();
         } else {
-          this.toastr.error(res.message || 'فشل العملية');
+          this.toastr.error('فشل العملية');
         }
       },
       error: () => {
