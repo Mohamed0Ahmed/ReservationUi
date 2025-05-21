@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
-import { ApiResponse, GiftDto, GiftRedemptionDto } from '../../interface/interfaces';
+import {
+  ApiResponse,
+  GiftDto,
+  GiftRedemptionDto,
+} from '../../interface/interfaces';
 import { environment } from '../../env/enviroment';
-import { CreateGiftRedemptionDto } from '../../interface/DTOs';
-
-export interface UpdateGiftRedemptionStatusDto {
-  status: number;
-  rejectionReason: string;
-}
+import { CreateGiftRedemptionDto, UpdateGiftRedemptionStatusDto } from '../../interface/DTOs';
 
 
 

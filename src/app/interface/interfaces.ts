@@ -86,12 +86,12 @@ export interface GiftRedemptionDto {
   giftId: number;
   giftName: string;
   customerId: number;
-  customerPhone: string;
+  customerNumber: string;
   roomId: number;
   roomName: string;
   storeId: number;
   pointsUsed: number;
-  status: string;
+  status: number;
   rejectionReason: string;
   isCustomerConfirmed?: boolean;
 }

@@ -13,9 +13,11 @@ import {
   RequestDto,
   Assistance,
   OrderItem,
+  GiftRedemptionDto,
 } from '../../interface/interfaces';
 import { Subscription } from 'rxjs';
 import { AssistanceService } from '../../core/services/Assistance.service';
+import { GiftRedemptionService } from '../../core/services/giftRedem.service';
 
 @Component({
   selector: 'app-orders',
@@ -27,16 +29,22 @@ export class OrdersComponent implements OnDestroy {
   orders = signal<Order[]>([]);
   items = signal<Item[]>([]);
   assistanceRequests = signal<RequestDto[]>([]);
+  redemptions = signal<GiftRedemptionDto[]>([]);
   assistanceTypes = signal<Assistance[]>([]);
   showModal = signal(false);
-  modalAction = signal<'rejectOrder' | 'rejectAssistance'>('rejectOrder');
+  modalAction = signal<'rejectOrder' | 'rejectAssistance' | 'rejectRedemption'>(
+    'rejectOrder'
+  );
   selectedId = signal<number | null>(null);
   rejectionReason = signal('');
   storeId = signal<number | null>(null);
-  currentFilter = signal<'orders' | 'assistance'>('orders');
+  currentFilter = signal<'orders' | 'assistance' | 'redemptions'>('orders');
   orderView = signal<'pendingOrders' | 'allOrders'>('pendingOrders');
   assistanceView = signal<'pendingAssistance' | 'allAssistance'>(
     'pendingAssistance'
+  );
+  redemptionView = signal<'pendingRedemptions' | 'allRedemptions'>(
+    'pendingRedemptions'
   );
   activeTab = signal<{ [key: number]: 'details' | 'items' }>({});
 
@@ -56,6 +64,14 @@ export class OrdersComponent implements OnDestroy {
     return allRequests;
   });
 
+  filteredRedemptions = computed(() => {
+    const allRedemptions = this.redemptions();
+    if (this.redemptionView() === 'pendingRedemptions') {
+      return allRedemptions.filter((redemption) => redemption.status === 0);
+    }
+    return allRedemptions;
+  });
+
   totalOrders = computed(() => {
     return this.filteredOrders().length;
   });
@@ -64,11 +80,21 @@ export class OrdersComponent implements OnDestroy {
     return this.filteredAssistanceRequests().length;
   });
 
+  totalRedemptions = computed(() => {
+    return this.filteredRedemptions().length;
+  });
+
   pendingOrdersCount = computed(
     () => this.orders().filter((order) => order.status === 0).length
   );
+
   pendingAssistanceCount = computed(
     () => this.assistanceRequests().filter((req) => req.status === 0).length
+  );
+
+  pendingRedemptionsCount = computed(
+    () =>
+      this.redemptions().filter((redemption) => redemption.status === 0).length
   );
 
   private subscription: Subscription | null = null;
@@ -78,6 +104,7 @@ export class OrdersComponent implements OnDestroy {
     private menuService: MenuService,
     private assistanceService: AssistanceService,
     private requestService: RequestService,
+    private giftRedemptionService: GiftRedemptionService,
     private notificationService: NotificationService,
     private authService: AuthService,
     private toastr: ToastrService
@@ -87,6 +114,7 @@ export class OrdersComponent implements OnDestroy {
     this.loadItems();
     this.loadAssistanceTypes();
     this.loadPendingAssistanceRequests();
+    this.loadPendingRedemptions();
 
     this.subscription = this.notificationService.notification$.subscribe(
       (message) => {
@@ -167,6 +195,34 @@ export class OrdersComponent implements OnDestroy {
       });
   }
 
+  loadRedemptions() {
+    if (!this.storeId()) return;
+    this.giftRedemptionService.getAllRedemptions().subscribe({
+      next: (res) => {
+        if (res.isSuccess && res.data) {
+          this.redemptions.set(res.data.reverse());
+        }
+      },
+      error: () => {
+        this.toastr.error('تحقق من الانترنت الخاص بك');
+      },
+    });
+  }
+
+  loadPendingRedemptions() {
+    if (!this.storeId()) return;
+    this.giftRedemptionService.getPendingRedemptions().subscribe({
+      next: (res) => {
+        console.log(res);
+
+        if (res.isSuccess && res.data) {
+          this.redemptions.set(res.data);
+        }
+      },
+      error: () => {},
+    });
+  }
+
   loadItems() {
     if (!this.storeId()) return;
     this.menuService.getAllItems(this.storeId()!).subscribe({
@@ -191,50 +247,74 @@ export class OrdersComponent implements OnDestroy {
     });
   }
 
-  setFilter(filter: 'orders' | 'assistance') {
+  setFilter(filter: 'orders' | 'assistance' | 'redemptions') {
     this.currentFilter.set(filter);
     if (filter === 'orders') {
       this.orderView() === 'pendingOrders'
         ? this.loadPendingOrders()
         : this.loadOrders();
-    } else {
+    } else if (filter === 'assistance') {
       this.assistanceView() === 'pendingAssistance'
         ? this.loadPendingAssistanceRequests()
         : this.loadAssistanceRequests();
+    } else {
+      this.redemptionView() === 'pendingRedemptions'
+        ? this.loadPendingRedemptions()
+        : this.loadRedemptions();
     }
   }
 
   toggleView(
-    view: 'pendingOrders' | 'allOrders' | 'pendingAssistance' | 'allAssistance'
+    view:
+      | 'pendingOrders'
+      | 'allOrders'
+      | 'pendingAssistance'
+      | 'allAssistance'
+      | 'pendingRedemptions'
+      | 'allRedemptions'
   ) {
     if (view === 'pendingOrders' || view === 'allOrders') {
       this.orderView.set(view);
       view === 'pendingOrders' ? this.loadPendingOrders() : this.loadOrders();
-    } else {
+    } else if (view === 'pendingAssistance' || view === 'allAssistance') {
       this.assistanceView.set(view);
       view === 'pendingAssistance'
         ? this.loadPendingAssistanceRequests()
         : this.loadAssistanceRequests();
+    } else {
+      this.redemptionView.set(view);
+      view === 'pendingRedemptions'
+        ? this.loadPendingRedemptions()
+        : this.loadRedemptions();
     }
   }
 
   refreshData(message: string) {
-    if (message.includes('طلب جديد')) {
-      if (this.currentFilter() === 'orders') {
-        this.orderView() === 'pendingOrders'
-          ? this.loadPendingOrders()
-          : this.loadOrders();
-      }
-    } else if (message.includes('طلب مساعدة')) {
-      if (this.currentFilter() === 'assistance') {
-        this.assistanceView() === 'pendingAssistance'
-          ? this.loadPendingAssistanceRequests()
-          : this.loadAssistanceRequests();
-      }
+    if (message.includes('طلب جديد') && this.currentFilter() === 'orders') {
+      this.orderView() === 'pendingOrders'
+        ? this.loadPendingOrders()
+        : this.loadOrders();
+    } else if (
+      message.includes('طلب مساعدة') &&
+      this.currentFilter() === 'assistance'
+    ) {
+      this.assistanceView() === 'pendingAssistance'
+        ? this.loadPendingAssistanceRequests()
+        : this.loadAssistanceRequests();
+    } else if (
+      (message.includes('طلب استبدال') || message === 'redemption_updated') &&
+      this.currentFilter() === 'redemptions'
+    ) {
+      this.redemptionView() === 'pendingRedemptions'
+        ? this.loadPendingRedemptions()
+        : this.loadRedemptions();
     }
   }
 
-  openModal(action: 'rejectOrder' | 'rejectAssistance', id: number) {
+  openModal(
+    action: 'rejectOrder' | 'rejectAssistance' | 'rejectRedemption',
+    id: number
+  ) {
     this.modalAction.set(action);
     this.showModal.set(true);
     this.selectedId.set(id);
@@ -262,7 +342,6 @@ export class OrdersComponent implements OnDestroy {
             });
           });
           const pendingCount = this.pendingOrdersCount();
-          console.log('Pending orders after update:', pendingCount);
           if (pendingCount === 0) {
             this.loadPendingOrders();
           }
@@ -291,7 +370,6 @@ export class OrdersComponent implements OnDestroy {
             });
           });
           const pendingCount = this.pendingAssistanceCount();
-          console.log('Pending requests after update:', pendingCount);
           if (pendingCount === 0) {
             this.loadPendingAssistanceRequests();
           }
@@ -306,6 +384,39 @@ export class OrdersComponent implements OnDestroy {
         this.toastr.error('حدث خطأ أثناء الموافقة على طلب المساعدة');
       },
     });
+  }
+
+  approveRedemption(redemptionId: number) {
+    this.selectedId.set(redemptionId);
+    const dto = { isApproved: true, rejectionReason: '' };
+    this.giftRedemptionService
+      .updateRedemptionStatus(redemptionId, dto)
+      .subscribe({
+        next: (res) => {
+          if (res.isSuccess) {
+            this.redemptions.update((redemptions) => {
+              return redemptions.map((redemption) => {
+                if (redemption.id === redemptionId) {
+                  return { ...redemption, status: 1 };
+                }
+                return redemption;
+              });
+            });
+            const pendingCount = this.pendingRedemptionsCount();
+            if (pendingCount === 0) {
+              this.loadPendingRedemptions();
+            }
+            this.toastr.success(
+              res.message || 'تم الموافقة على طلب الاستبدال بنجاح'
+            );
+          } else {
+            this.toastr.error(res.message || 'فشل العملية');
+          }
+        },
+        error: () => {
+          this.toastr.error('حدث خطأ أثناء الموافقة على طلب الاستبدال');
+        },
+      });
   }
 
   rejectOrder() {
@@ -352,6 +463,32 @@ export class OrdersComponent implements OnDestroy {
         this.toastr.error('حدث خطأ أثناء رفض طلب المساعدة');
       },
     });
+  }
+
+  rejectRedemption() {
+    const redemptionId = this.selectedId();
+    const reason = this.rejectionReason();
+    if (!redemptionId || !reason) {
+      this.toastr.error('سبب الرفض مطلوب');
+      return;
+    }
+    const dto = { isApproved: false, rejectionReason: reason };
+    this.giftRedemptionService
+      .updateRedemptionStatus(redemptionId, dto)
+      .subscribe({
+        next: (res) => {
+          if (res.isSuccess) {
+            this.refreshData('redemption_updated');
+            this.toastr.success(res.message || 'تم رفض طلب الاستبدال بنجاح');
+            this.closeModal();
+          } else {
+            this.toastr.error(res.message || 'فشل العملية');
+          }
+        },
+        error: () => {
+          this.toastr.error('حدث خطأ أثناء رفض طلب الاستبدال');
+        },
+      });
   }
 
   getStatusLabel(status: number): string {
@@ -403,6 +540,10 @@ export class OrdersComponent implements OnDestroy {
 
   trackByItem(_: number, item: OrderItem): number {
     return item.menuItemId;
+  }
+
+  trackByRedemption(_: number, redemption: GiftRedemptionDto): number {
+    return redemption.id!;
   }
 
   ngOnDestroy() {
