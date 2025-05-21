@@ -7,7 +7,13 @@ import {
 import { MenuService } from '../../core/services/menu.service';
 import { CustomerService } from '../../core/services/customer.service';
 import { OrderService } from '../../core/services/order.service';
-import { Category, Item, ApiResponse } from '../../interface/interfaces';
+import {
+  Category,
+  Item,
+  ApiResponse,
+  GiftDto,
+  Customer,
+} from '../../interface/interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -15,6 +21,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { SidenavComponent } from '../sidenav/sidenav.component';
 import { Router } from '@angular/router';
+import { GiftRedemptionService } from '../../core/services/giftRedem.service';
+import { CreateGiftRedemptionDto } from '../../interface/DTOs';
 
 @Component({
   selector: 'app-home',
@@ -26,17 +34,24 @@ import { Router } from '@angular/router';
 export class HomeComponent implements OnInit {
   categories = signal<Category[]>([]);
   items = signal<Item[]>([]);
+  gifts = signal<GiftDto[]>([]);
   error = signal<string | null>(null);
   cart = signal<
     { menuItemId: number; quantity: number; name: string; price: number }[]
   >([]);
   showCartModal = signal<boolean>(false);
   showLoginModal = signal<boolean>(false);
+  showPointsModal = signal<boolean>(false);
   phoneNumber = signal<string>('');
+  pointsPhoneNumber = signal<string>('');
+  points = signal<number | null>(null);
+  pointsError = signal<string | null>(null);
   storeId: number;
   roomId: number;
   sortOption = signal<'price-desc' | 'price-asc'>('price-desc');
   viewMode = signal<'byCategory' | 'allItems'>('byCategory');
+  currentTab = signal<'orders' | 'gifts'>('orders');
+  selectedGift = signal<GiftDto | null>(null);
 
   carouselOptions: OwlOptions = {
     loop: false,
@@ -56,6 +71,7 @@ export class HomeComponent implements OnInit {
     private menuService: MenuService,
     private customerService: CustomerService,
     private orderService: OrderService,
+    private giftRedemptionService: GiftRedemptionService,
     private toastr: ToastrService,
     private authService: AuthService,
     private router: Router
@@ -75,6 +91,11 @@ export class HomeComponent implements OnInit {
       return;
     }
     this.loadCategories();
+    this.loadGifts();
+  }
+
+  setTab(tab: 'orders' | 'gifts') {
+    this.currentTab.set(tab);
   }
 
   loadCategories(): void {
@@ -124,6 +145,19 @@ export class HomeComponent implements OnInit {
           }
         },
       });
+    });
+  }
+
+  loadGifts(): void {
+    this.giftRedemptionService.getAvailableGifts(this.storeId).subscribe({
+      next: (response: ApiResponse<GiftDto[]>) => {
+        if (response.isSuccess && response.data) {
+          this.gifts.set(response.data);
+        } else {
+          this.toastr.error(response.message || 'فشل تحميل الهدايا');
+        }
+      },
+      error: () => this.toastr.error('تحقق من الانترنت الخاص بك'),
     });
   }
 
@@ -234,6 +268,15 @@ export class HomeComponent implements OnInit {
     return chunks;
   }
 
+  getGiftChunks(): GiftDto[][] {
+    const chunks: GiftDto[][] = [];
+    const allGifts = this.gifts();
+    for (let i = 0; i < allGifts.length; i += 12) {
+      chunks.push(allGifts.slice(i, i + 12));
+    }
+    return chunks;
+  }
+
   addToCart(item: Item): void {
     const currentCart = this.cart();
     const cartItem = currentCart.find(
@@ -257,6 +300,11 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  requestGift(gift: GiftDto): void {
+    this.selectedGift.set(gift);
+    this.openLoginModal();
+  }
+
   openCartModal(): void {
     this.showCartModal.set(true);
   }
@@ -272,7 +320,55 @@ export class HomeComponent implements OnInit {
 
   closeLoginModal(): void {
     this.showLoginModal.set(false);
-    this.showCartModal.set(true);
+    if (this.currentTab() === 'orders') {
+      this.showCartModal.set(true);
+    }
+    this.selectedGift.set(null);
+  }
+
+  openPointsModal(): void {
+    this.showPointsModal.set(true);
+    this.pointsPhoneNumber.set('');
+    this.points.set(null);
+    this.pointsError.set(null);
+  }
+
+  closePointsModal(): void {
+    this.showPointsModal.set(false);
+    this.pointsPhoneNumber.set('');
+    this.points.set(null);
+    this.pointsError.set(null);
+  }
+
+  checkPoints(): void {
+    const phone = this.pointsPhoneNumber().trim();
+    const egyptianPhoneRegex = /^(010|011|012|015)[0-9]{8}$/;
+
+    if (!phone) {
+      this.pointsError.set('يرجى إدخال رقم التليفون');
+      return;
+    }
+
+    if (!egyptianPhoneRegex.test(phone)) {
+      this.pointsError.set('من فضلك أدخل رقم تليفون صحيح');
+      return;
+    }
+
+    this.customerService.loginCustomer(phone, this.storeId).subscribe({
+      next: (response: ApiResponse<Customer>) => {
+        if (response.isSuccess && response.data) {
+          this.points.set(response.data.points);
+          this.pointsError.set(null);
+        } else {
+          this.pointsError.set(response.message || 'رقم التليفون غير موجود');
+          this.points.set(null);
+        }
+      },
+      error: () => {
+        this.pointsError.set('تحقق من الانترنت الخاص بك');
+        this.points.set(null);
+      },
+    });
   }
 
   updateQuantity(itemId: number, change: number): void {
@@ -316,7 +412,11 @@ export class HomeComponent implements OnInit {
     this.customerService.loginCustomer(phone, this.storeId).subscribe({
       next: (response) => {
         if (response.isSuccess && response.data) {
-          this.submitOrder();
+          if (this.currentTab() === 'orders') {
+            this.submitOrder();
+          } else if (this.currentTab() === 'gifts' && this.selectedGift()) {
+            this.submitGiftRedemption();
+          }
         } else {
           this.toastr.error(response.message || 'فشل تسجيل الدخول', 'خطأ');
         }
@@ -346,10 +446,39 @@ export class HomeComponent implements OnInit {
           }
         },
         error: () => {
-          this.toastr.error('تحقق من الانترنت الخاص بك'),
-            this.showLoginModal.set(true);
+          this.toastr.error('تحقق من الانترنت الخاص بك');
+          this.showLoginModal.set(true);
         },
       });
+  }
+
+  submitGiftRedemption(): void {
+    const gift = this.selectedGift();
+    if (!gift) {
+      this.toastr.error('لم يتم اختيار هدية', 'خطأ');
+      return;
+    }
+    const dto: CreateGiftRedemptionDto = {
+      giftId: gift.id!,
+      customerNumber: this.phoneNumber(),
+      roomId: this.roomId,
+    };
+    this.giftRedemptionService.requestGiftRedemption(dto).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.toastr.success('تم إرسال طلب الهدية بنجاح', 'نجاح');
+          this.closeLoginModal();
+          this.selectedGift.set(null);
+        } else {
+          this.toastr.error(response.message || 'فشل إرسال طلب الهدية', 'خطأ');
+          this.showLoginModal.set(true);
+        }
+      },
+      error: () => {
+        this.toastr.error('تحقق من الانترنت الخاص بك');
+        this.showLoginModal.set(true);
+      },
+    });
   }
 
   getTotalAmount(): number {

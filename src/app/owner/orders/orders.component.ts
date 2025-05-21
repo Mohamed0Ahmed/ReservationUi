@@ -33,47 +33,44 @@ export class OrdersComponent implements OnDestroy {
   selectedId = signal<number | null>(null);
   rejectionReason = signal('');
   storeId = signal<number | null>(null);
-  currentFilter = signal<
-    'orders' | 'pendingOrders' | 'assistance' | 'assistancePending'
-  >('pendingOrders');
+  currentFilter = signal<'orders' | 'assistance'>('orders');
+  orderView = signal<'pendingOrders' | 'allOrders'>('pendingOrders');
+  assistanceView = signal<'pendingAssistance' | 'allAssistance'>(
+    'pendingAssistance'
+  );
   activeTab = signal<{ [key: number]: 'details' | 'items' }>({});
+
   filteredOrders = computed(() => {
     const allOrders = this.orders();
-    if (this.currentFilter() === 'orders') {
-      return allOrders;
+    if (this.orderView() === 'pendingOrders') {
+      return allOrders.filter((order) => order.status === 0);
     }
-    return allOrders.filter((order) => order.status === 0);
+    return allOrders;
   });
 
   filteredAssistanceRequests = computed(() => {
     const allRequests = this.assistanceRequests();
-    if (this.currentFilter() === 'assistance') {
-      return allRequests;
+    if (this.assistanceView() === 'pendingAssistance') {
+      return allRequests.filter((req) => req.status === 0);
     }
-    return allRequests.filter((req) => req.status === 0);
+    return allRequests;
   });
 
   totalOrders = computed(() => {
-    if (this.currentFilter() === 'pendingOrders') {
-      return this.pendingOrdersCount();
-    }
-    return this.orders().length;
+    return this.filteredOrders().length;
   });
 
   totalAssistanceRequests = computed(() => {
-    if (this.currentFilter() === 'assistancePending') {
-      return this.pendingAssistanceCount();
-    }
-    return this.assistanceRequests().length;
+    return this.filteredAssistanceRequests().length;
   });
 
   pendingOrdersCount = computed(
     () => this.orders().filter((order) => order.status === 0).length
   );
-
   pendingAssistanceCount = computed(
     () => this.assistanceRequests().filter((req) => req.status === 0).length
   );
+
   private subscription: Subscription | null = null;
 
   constructor(
@@ -140,8 +137,7 @@ export class OrdersComponent implements OnDestroy {
           this.activeTab.set(updatedTabs);
         }
       },
-      error: () => {
-      },
+      error: () => {},
     });
   }
 
@@ -153,8 +149,7 @@ export class OrdersComponent implements OnDestroy {
           this.assistanceRequests.set(res.data.reverse());
         }
       },
-      error: () => {
-      },
+      error: () => {},
     });
   }
 
@@ -168,8 +163,7 @@ export class OrdersComponent implements OnDestroy {
             this.assistanceRequests.set(res.data);
           }
         },
-        error: () => {
-        },
+        error: () => {},
       });
   }
 
@@ -181,8 +175,7 @@ export class OrdersComponent implements OnDestroy {
           this.items.set(res.data);
         }
       },
-      error: () => {
-      },
+      error: () => {},
     });
   }
 
@@ -194,36 +187,49 @@ export class OrdersComponent implements OnDestroy {
           this.assistanceTypes.set(res.data);
         }
       },
-      error: () => {
-      },
+      error: () => {},
     });
   }
 
-  setFilter(
-    filter: 'orders' | 'pendingOrders' | 'assistance' | 'assistancePending'
-  ) {
+  setFilter(filter: 'orders' | 'assistance') {
     this.currentFilter.set(filter);
     if (filter === 'orders') {
-      this.loadOrders();
-    } else if (filter === 'pendingOrders') {
-      this.loadPendingOrders();
-    } else if (filter === 'assistance') {
-      this.loadAssistanceRequests();
+      this.orderView() === 'pendingOrders'
+        ? this.loadPendingOrders()
+        : this.loadOrders();
     } else {
-      this.loadPendingAssistanceRequests();
+      this.assistanceView() === 'pendingAssistance'
+        ? this.loadPendingAssistanceRequests()
+        : this.loadAssistanceRequests();
+    }
+  }
+
+  toggleView(
+    view: 'pendingOrders' | 'allOrders' | 'pendingAssistance' | 'allAssistance'
+  ) {
+    if (view === 'pendingOrders' || view === 'allOrders') {
+      this.orderView.set(view);
+      view === 'pendingOrders' ? this.loadPendingOrders() : this.loadOrders();
+    } else {
+      this.assistanceView.set(view);
+      view === 'pendingAssistance'
+        ? this.loadPendingAssistanceRequests()
+        : this.loadAssistanceRequests();
     }
   }
 
   refreshData(message: string) {
     if (message.includes('طلب جديد')) {
       if (this.currentFilter() === 'orders') {
-        this.loadOrders();
-      } else if (this.currentFilter() === 'pendingOrders') {
-        this.loadPendingOrders();
+        this.orderView() === 'pendingOrders'
+          ? this.loadPendingOrders()
+          : this.loadOrders();
       }
     } else if (message.includes('طلب مساعدة')) {
       if (this.currentFilter() === 'assistance') {
-        this.loadAssistanceRequests();
+        this.assistanceView() === 'pendingAssistance'
+          ? this.loadPendingAssistanceRequests()
+          : this.loadAssistanceRequests();
       }
     }
   }
@@ -244,7 +250,6 @@ export class OrdersComponent implements OnDestroy {
 
   approveOrder(orderId: number) {
     this.selectedId.set(orderId);
-
     this.orderService.approveOrder(orderId).subscribe({
       next: (res) => {
         if (res.isSuccess) {
@@ -256,14 +261,11 @@ export class OrdersComponent implements OnDestroy {
               return order;
             });
           });
-
           const pendingCount = this.pendingOrdersCount();
           console.log('Pending orders after update:', pendingCount);
-
           if (pendingCount === 0) {
             this.loadPendingOrders();
           }
-
           this.toastr.success(res.message || 'تم الموافقة على الطلب بنجاح');
         } else {
           this.toastr.error(res.message || 'فشل العملية');
@@ -277,7 +279,6 @@ export class OrdersComponent implements OnDestroy {
 
   approveAssistanceRequest(requestId: number) {
     this.selectedId.set(requestId);
-
     this.requestService.approveAssistanceRequest(requestId).subscribe({
       next: (res) => {
         if (res.isSuccess) {
@@ -289,14 +290,11 @@ export class OrdersComponent implements OnDestroy {
               return req;
             });
           });
-
           const pendingCount = this.pendingAssistanceCount();
           console.log('Pending requests after update:', pendingCount);
-
           if (pendingCount === 0) {
             this.loadPendingAssistanceRequests();
           }
-
           this.toastr.success(
             res.message || 'تم الموافقة على طلب المساعدة بنجاح'
           );
@@ -313,12 +311,10 @@ export class OrdersComponent implements OnDestroy {
   rejectOrder() {
     const orderId = this.selectedId();
     const reason = { reason: this.rejectionReason() };
-
     if (!orderId || !reason.reason) {
       this.toastr.error('سبب الرفض مطلوب');
       return;
     }
-
     this.orderService.rejectOrder(orderId, reason).subscribe({
       next: (res) => {
         if (res.isSuccess) {
@@ -338,12 +334,10 @@ export class OrdersComponent implements OnDestroy {
   rejectAssistanceRequest() {
     const requestId = this.selectedId();
     const reason = { reason: this.rejectionReason() };
-
     if (!requestId || !reason.reason) {
       this.toastr.error('سبب الرفض مطلوب');
       return;
     }
-
     this.requestService.rejectAssistanceRequest(requestId, reason).subscribe({
       next: (res) => {
         if (res.isSuccess) {

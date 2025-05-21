@@ -12,3 +12,14 @@ export interface UpdateMenuItemRequest {
   name: string;
   price: number;
 }
+
+export interface CreateGiftRedemptionDto {
+  giftId: number;
+  customerNumber: string;
+  roomId: number;
+}
+
+export interface UpdateGiftRedemptionStatusDto {
+  isApproved: boolean;
+  rejectionReason?: string;
+}

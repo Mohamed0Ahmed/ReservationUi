@@ -22,4 +22,14 @@ export class CustomerService {
       StoreId: storeId,
     });
   }
+
+  getCustomerByPhone(
+    phoneNumber: string,
+    storeId: number
+  ): Observable<ApiResponse<Customer>> {
+    return this.http.post<ApiResponse<Customer>>(`${this.apiUrl}/phone`, {
+      PhoneNumber: phoneNumber,
+      StoreId: storeId,
+    });
+  }
 }

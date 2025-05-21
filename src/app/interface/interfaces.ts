@@ -80,3 +80,18 @@ export interface GiftDto {
   pointsRequired: number;
   storeId?: number;
 }
+
+export interface GiftRedemptionDto {
+  id: number;
+  giftId: number;
+  giftName: string;
+  customerId: number;
+  customerPhone: string;
+  roomId: number;
+  roomName: string;
+  storeId: number;
+  pointsUsed: number;
+  status: string;
+  rejectionReason: string;
+  isCustomerConfirmed?: boolean;
+}

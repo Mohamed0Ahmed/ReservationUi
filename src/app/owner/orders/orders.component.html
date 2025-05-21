@@ -1,99 +1,87 @@
 <div dir="rtl" class="container mx-auto p-4">
   <h1 class="text-2xl font-bold text-white mb-4">الطلبات وطلبات المساعدة</h1>
-  <div class="mb-4 grid grid-cols-2 lg:grid-cols-4 gap-2">
-    <p class="col-span-2 lg:col-span-4 text-gray-400 mb-2">
+  <div class="mb-4 grid grid-cols-2 gap-2">
+    <p class="col-span-2 text-gray-400 mb-2">
       إجمالي:
-      {{
-        currentFilter() === "orders" || currentFilter() === "pendingOrders"
-          ? totalOrders()
-          : totalAssistanceRequests()
-      }}
-      {{
-        currentFilter() === "orders" || currentFilter() === "pendingOrders"
-          ? "طلبات"
-          : "طلبات مساعدة"
-      }}
+      {{ currentFilter() === 'orders' ? totalOrders() : totalAssistanceRequests() }}
+      {{ currentFilter() === 'orders' ? 'طلبات' : 'طلبات مساعدة' }}
     </p>
     <button
       (click)="setFilter('orders')"
-      class="px-4 py-2 hover:bg-opacity-80"
-      [ngClass]="
-        currentFilter() === 'orders'
-          ? 'bg-gray-700 text-white'
-          : 'bg-gray-950 text-white'
-      "
-    >
-      الاوردرات
-    </button>
-    <button
-      (click)="setFilter('pendingOrders')"
       class="relative px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
-        currentFilter() === 'pendingOrders'
-          ? 'bg-gray-700 text-white'
-          : 'bg-gray-950 text-white'
+        currentFilter() === 'orders' ? 'bg-gray-700 text-white' : 'bg-gray-950 text-white'
       "
     >
       الأوردرات الحالية
+      <!-- Badge لعرض عدد الأوردرات المعلقة -->
       <span
         class="absolute top-0 right-3 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs transform translate-x-1/2 -translate-y-1/2"
       >
         {{ pendingOrdersCount() }}
       </span>
     </button>
-
     <button
-      (click)="setFilter('assistancePending')"
+      (click)="setFilter('assistance')"
       class="relative px-4 py-2 hover:bg-opacity-80"
       [ngClass]="
-        currentFilter() === 'assistancePending'
-          ? 'bg-gray-700 text-white'
-          : 'bg-gray-950 text-white'
+        currentFilter() === 'assistance' ? 'bg-gray-700 text-white' : 'bg-gray-950 text-white'
       "
     >
       طلبات المساعدة الحالية
+      <!-- Badge لعرض عدد طلبات المساعدة المعلقة -->
       <span
         class="absolute top-0 right-3 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs transform translate-x-1/2 -translate-y-1/2"
       >
         {{ pendingAssistanceCount() }}
       </span>
     </button>
-    <button
-      (click)="setFilter('assistance')"
-      class="px-4 py-2 hover:bg-opacity-80"
-      [ngClass]="
-        currentFilter() === 'assistance'
-          ? 'bg-gray-700 text-white'
-          : 'bg-gray-950 text-white'
-      "
-    >
-      طلبات المساعدة
-    </button>
   </div>
 
-  <!-- *Orders Cards -->
+  <!-- Toggle Buttons -->
+  <div class="flex justify-center mb-4">
+    <div class="inline-flex rounded-md shadow-sm" role="group">
+      <button
+        (click)="toggleView(currentFilter() === 'orders' ? 'pendingOrders' : 'pendingAssistance')"
+        class="px-4 py-2 text-sm font-medium text-white"
+        [ngClass]="
+          (currentFilter() === 'orders' && orderView() === 'pendingOrders') ||
+          (currentFilter() === 'assistance' && assistanceView() === 'pendingAssistance')
+            ? 'bg-gray-700'
+            : 'bg-gray-950 hover:bg-opacity-80'
+        "
+      >
+        معلقة
+      </button>
+      <button
+        (click)="toggleView(currentFilter() === 'orders' ? 'allOrders' : 'allAssistance')"
+        class="px-4 py-2 text-sm font-medium text-white"
+        [ngClass]="
+          (currentFilter() === 'orders' && orderView() === 'allOrders') ||
+          (currentFilter() === 'assistance' && assistanceView() === 'allAssistance')
+            ? 'bg-gray-700'
+            : 'bg-gray-950 hover:bg-opacity-80'
+        "
+      >
+        الكل
+      </button>
+    </div>
+  </div>
+
+  <!-- Orders Cards -->
   <div
-    *ngIf="currentFilter() === 'orders' || currentFilter() === 'pendingOrders'"
+    *ngIf="currentFilter() === 'orders'"
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"
   >
     @for (order of filteredOrders(); track trackByOrder($index, order)) {
     <div class="w-full border border-gray-700 rounded-lg shadow-sm">
       <div class="flex border-b border-gray-700 bg-gray-950 rounded-t-lg">
         <button
-          (click)="
-            setActiveTab(
-              order.id,
-              activeTab()[order.id] === 'details' ? 'items' : 'details'
-            )
-          "
+          (click)="setActiveTab(order.id, activeTab()[order.id] === 'details' ? 'items' : 'details')"
           class="flex-1 p-4 text-sm font-medium"
-          [ngClass]="
-            activeTab()[order.id] === 'details'
-              ? 'text-blue-500 '
-              : 'text-gray-400 '
-          "
+          [ngClass]="activeTab()[order.id] === 'details' ? 'text-blue-500' : 'text-gray-400'"
         >
-          {{ activeTab()[order.id] === "details" ? "تفاصيل الطلب" : "الأصناف" }}
+          {{ activeTab()[order.id] === 'details' ? 'تفاصيل الطلب' : 'الأصناف' }}
         </button>
       </div>
       <div class="p-4">
@@ -101,7 +89,7 @@
         <dl class="space-y-2">
           <div class="flex justify-between">
             <dt class="font-medium text-white">اسم الغرفة:</dt>
-            <dd class="text-gray-400">{{ order.roomName || "غير معروف" }}</dd>
+            <dd class="text-gray-400">{{ order.roomName || 'غير معروف' }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">رقم العميل:</dt>
@@ -109,9 +97,7 @@
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">تاريخ الطلب:</dt>
-            <dd class="text-gray-400">
-              {{ convertToEgyptTime(order.orderDate) }}
-            </dd>
+            <dd class="text-gray-400">{{ convertToEgyptTime(order.orderDate) }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">المجموع:</dt>
@@ -119,7 +105,7 @@
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">سبب الرفض:</dt>
-            <dd class="text-gray-400">{{ order.rejectionReason || "-" }}</dd>
+            <dd class="text-gray-400">{{ order.rejectionReason || '-' }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">الحالة:</dt>
@@ -157,9 +143,7 @@
           @for (item of order.orderItems; track trackByItem($index, item)) {
           <div>
             <div class="flex justify-between items-center px-5">
-              <dt class="font-medium text-white">
-                {{ getItemName(item.menuItemId) }}
-              </dt>
+              <dt class="font-medium text-white">{{ getItemName(item.menuItemId) }}</dt>
               <dd class="text-gray-400 text-sm">{{ item.quantity }}</dd>
             </div>
           </div>
@@ -170,43 +154,31 @@
     </div>
     } @if (!filteredOrders().length) {
     <div class="text-center text-gray-400 p-4">
-      {{
-        currentFilter() === "pendingOrders"
-          ? "لا يوجد طلبات معلقة حالياً"
-          : "لا توجد طلبات"
-      }}
+      {{ orderView() === 'pendingOrders' ? 'لا يوجد طلبات معلقة حالياً' : 'لا توجد طلبات' }}
     </div>
     }
   </div>
 
   <!-- Assistance Requests Cards -->
   <div
-    *ngIf="
-      currentFilter() === 'assistance' ||
-      currentFilter() === 'assistancePending'
-    "
+    *ngIf="currentFilter() === 'assistance'"
     class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"
   >
-    @for (request of filteredAssistanceRequests(); track trackByRequest($index,
-    request)) {
+    @for (request of filteredAssistanceRequests(); track trackByRequest($index, request)) {
     <div class="w-full border border-gray-700 rounded-lg shadow-sm">
       <div class="p-4">
         <dl class="space-y-2">
           <div class="flex justify-between">
             <dt class="font-medium text-white">اسم الغرفة:</dt>
-            <dd class="text-gray-400">{{ request.roomName || "غير معروف" }}</dd>
+            <dd class="text-gray-400">{{ request.roomName || 'غير معروف' }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">نوع المساعدة:</dt>
-            <dd class="text-gray-100">
-              {{ getAssistanceTypeName(request.requestTypeId) }}
-            </dd>
+            <dd class="text-gray-100">{{ getAssistanceTypeName(request.requestTypeId) }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">تاريخ الطلب:</dt>
-            <dd class="text-gray-400">
-              {{ convertToEgyptTime(request.requestDate) }}
-            </dd>
+            <dd class="text-gray-400">{{ convertToEgyptTime(request.requestDate) }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">الحالة:</dt>
@@ -222,7 +194,7 @@
           </div>
           <div class="flex justify-between">
             <dt class="font-medium text-white">سبب الرفض:</dt>
-            <dd class="text-gray-400">{{ request.rejectionReason || "-" }}</dd>
+            <dd class="text-gray-400">{{ request.rejectionReason || '-' }}</dd>
           </div>
         </dl>
         <div class="mt-4 flex justify-end space-x-2 space-x-reverse">
@@ -247,23 +219,17 @@
     </div>
     } @if (!filteredAssistanceRequests().length) {
     <div class="text-center text-gray-400 p-4">
-      {{
-        currentFilter() === "assistancePending"
-          ? "لا يوجد طلبات مساعدة معلقة حالياً"
-          : "لا توجد طلبات مساعدة"
-      }}
+      {{ assistanceView() === 'pendingAssistance' ? 'لا يوجد طلبات مساعدة معلقة حالياً' : 'لا توجد طلبات مساعدة' }}
     </div>
     }
   </div>
 
   <!-- Modal for Reject Reason -->
   @if (showModal()) {
-  <div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-  >
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm">
       <h2 class="text-xl text-white mb-4">
-        {{ modalAction() === "rejectOrder" ? "رفض الطلب" : "رفض طلب المساعدة" }}
+        {{ modalAction() === 'rejectOrder' ? 'رفض الطلب' : 'رفض طلب المساعدة' }}
       </h2>
       <div class="mb-4">
         <input
@@ -281,11 +247,7 @@
           إلغاء
         </button>
         <button
-          (click)="
-            modalAction() === 'rejectOrder'
-              ? rejectOrder()
-              : rejectAssistanceRequest()
-          "
+          (click)="modalAction() === 'rejectOrder' ? rejectOrder() : rejectAssistanceRequest()"
           class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
         >
           تأكيد الرفض
